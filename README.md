@@ -31,12 +31,12 @@ new roles and modifiers on top of [Town Of Us &ndash; Mira](https://github.com/A
   <a href="https://github.com/DivaniNL/TownOfUsMiraDivaniModsAddOn/wiki/Home#opportunist"><img width="10%" src="./Resources/OpportunistIcon.png" alt="Opportunist"/></a>
   <img src="./Resources/Headers/CrewMods.png" alt="Crewmate modifiers"/>
   <a href="https://github.com/DivaniNL/TownOfUsMiraDivaniModsAddOn/wiki/Home#blindspot"><img width="10%" src="./Resources/BlindspotIcon.png" alt="Blindspot"/></a>
-  <a href="https://github.com/DivaniNL/TownOfUsMiraDivaniModsAddOn/wiki/Home#bear-trap"><img width="10%" src="./Resources/InnocentIcon.png" alt="Bear Trap"/></a>
+  <a href="https://github.com/DivaniNL/TownOfUsMiraDivaniModsAddOn/wiki/Home#bear-trap"><img width="10%" src="./Resources/BearTrapIcon.png" alt="Bear Trap"/></a>
   <img src="./Resources/Headers/ImpMods.png" alt="Impostor modifiers"/>
   <a href="https://github.com/DivaniNL/TownOfUsMiraDivaniModsAddOn/wiki/Home#ruthless"><img width="10%" src="./Resources/RuthlessIcon.png" alt="Ruthless"/></a>
   <img src="./Resources/Headers/UniMods.png" alt="Universal modifiers"/>
   <a href="https://github.com/DivaniNL/TownOfUsMiraDivaniModsAddOn/wiki/Home#fragile"><img width="10%" src="./Resources/FragileIcon.png" alt="Fragile"/></a>
-  <a href="https://github.com/DivaniNL/TownOfUsMiraDivaniModsAddOn/wiki/Home#shuffle"><img width="10%" src="./Resources/ShuffleButton.png" alt="Shuffle"/></a>
+  <a href="https://github.com/DivaniNL/TownOfUsMiraDivaniModsAddOn/wiki/Home#shuffle"><img width="10%" src="./Resources/ShuffleIcon.png" alt="Shuffle"/></a>
   <a href="https://github.com/DivaniNL/TownOfUsMiraDivaniModsAddOn/wiki/Home#misvote"><img width="10%" src="./Resources/MisvoteIcon.png" alt="Misvote"/></a>
 </p>
 
