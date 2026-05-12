@@ -3,7 +3,7 @@
 > This mod requires Town of Us: Mira to be installed and is NOT for console versions of Among Us.
 
 <div align="center">
-  <a href="https://github.com/DivaniNL/TownOfUsMiraDivaniModsAddOn/wiki"><img src="./Resources/Banners/DivaniModsLogo.png" alt="Divani Mods"/></a>
+  <a href="https://github.com/DivaniNL/TownOfUsMiraDivaniModsAddOn/wiki"><img src="./Resources/Banners/DivaniModsLogoNew.png" alt="Divani Mods"/></a>
   <p>Divani Mods</p>
 </div>
 <br/>
