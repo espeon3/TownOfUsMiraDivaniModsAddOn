@@ -1,3 +1,4 @@
+using AmongUs.GameOptions;
 using MiraAPI.GameOptions;
 using MiraAPI.Roles;
 using MiraAPI.Utilities.Assets;
@@ -13,8 +14,8 @@ namespace DivaniMods.Modifiers.Game.Crewmate;
 
 public sealed class BloodyModifier : TouGameModifier, IColoredModifier, IWikiDiscoverable
 {
-    /// <summary>#333 — dark gray for UI / freeplay.</summary>
-    public static readonly Color32 ModifierUiColor = new(51, 51, 51, 255);
+    /// <summary>Impostor red for lobby UI / freeplay (footprints stay impostor red).</summary>
+    public static readonly Color ModifierUiColor = Palette.ImpostorRed;
 
     public override string ModifierName => "Bloody";
     public override string LocaleKey => "Bloody";

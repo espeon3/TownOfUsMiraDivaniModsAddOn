@@ -3,7 +3,7 @@ using MiraAPI.Events;
 using MiraAPI.Events.Vanilla.Gameplay;
 using MiraAPI.Events.Vanilla.Meeting;
 using MiraAPI.Modifiers;
-using DivaniMods.Modifiers;
+using DivaniMods.Modifiers.Crewmate;
 using DivaniMods.Modifiers.Game.Crewmate;
 using UnityEngine;
 

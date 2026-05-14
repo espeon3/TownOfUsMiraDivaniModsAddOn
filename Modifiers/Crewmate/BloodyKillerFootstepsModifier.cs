@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using AmongUs.GameOptions;
 using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
 using MiraAPI.Utilities;
@@ -14,11 +15,11 @@ using TownOfUs.Utilities;
 using TownOfUs.Utilities.Appearances;
 using UnityEngine;
 
-namespace DivaniMods.Modifiers;
+namespace DivaniMods.Modifiers.Crewmate;
 
 /// <summary>
 /// Temporary trail on the killer after slaying a crewmate with Bloody. Uses Investigator-style spacing;
-/// footprints are impostor red for all players.
+/// footprints are impostor red for all players. Runtime-only (not lobby-assignable).
 /// </summary>
 public sealed class BloodyKillerFootstepsModifier : BaseModifier
 {

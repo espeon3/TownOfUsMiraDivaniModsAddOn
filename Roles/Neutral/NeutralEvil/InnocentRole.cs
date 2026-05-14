@@ -26,7 +26,6 @@ public sealed class InnocentRole(IntPtr cppPtr)
 
     public byte? PendingTauntKillerId { get; set; }
     public byte? TauntedKillerId { get; set; }
-    public bool ShowTauntedTargetSymbol { get; set; }
     public bool TargetVoted { get; set; }
     public bool AboutToWin { get; set; }
     public bool AwaitingNextMeetingExile { get; set; }
@@ -73,7 +72,6 @@ public sealed class InnocentRole(IntPtr cppPtr)
         ActiveInnocents[targetPlayer.PlayerId] = this;
         PendingTauntKillerId = null;
         TauntedKillerId = null;
-        ShowTauntedTargetSymbol = false;
         TargetVoted = false;
         AboutToWin = false;
         AwaitingNextMeetingExile = false;
