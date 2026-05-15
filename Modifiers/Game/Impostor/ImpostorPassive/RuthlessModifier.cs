@@ -12,11 +12,13 @@ namespace DivaniMods.Modifiers.Game.Impostor.ImpostorPassive;
 
 public class RuthlessModifier : TouGameModifier, IColoredModifier, IWikiDiscoverable
 {
+    public static readonly Color RuthlessColor = Palette.ImpostorRoleHeaderRed;
     public override string ModifierName => "Ruthless";
     public override string LocaleKey => "Ruthless";
     public override ModifierFaction FactionType => ModifierFaction.ImpostorPassive;
-    public override Color FreeplayFileColor => Palette.ImpostorRed;
-    public Color ModifierColor => Palette.ImpostorRed;
+    public override Color FreeplayFileColor => RuthlessColor;
+    public Color ModifierColor => RuthlessColor;
+
     public override LoadableAsset<Sprite>? ModifierIcon => DivaniAssets.RuthlessIcon;
     
     public override string GetDescription() => "Your kills bypass shields. Veteran alerts still kill you.";

@@ -6,10 +6,12 @@ using MiraAPI.Events;
 using MiraAPI.Events.Mira;
 using MiraAPI.Events.Vanilla.Gameplay;
 using MiraAPI.Events.Vanilla.Meeting;
+using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
 using MiraAPI.Networking;
 using MiraAPI.Utilities;
 using DivaniMods.Modifiers.Game.Impostor.ImpostorPassive;
+using DivaniMods.Options;
 using TownOfUs.Modifiers;
 using TownOfUs.Modifiers.Crewmate;
 
@@ -84,8 +86,8 @@ public static class RuthlessEventHandler
         if (target.HasModifier<MedicShieldModifier>())
             return true;
 
-        // First-death shield is NOT a BaseShieldModifier (ExcludedGameModifier); still blocks kills until bypassed.
-        if (target.HasModifier<FirstDeadShield>())
+        // First-death shield is NOT a BaseShieldModifier (ExcludedGameModifier); check option.
+        if (OptionGroupSingleton<RuthlessOptions>.Instance.BypassFirstDeathShield && target.HasModifier<FirstDeadShield>())
             return true;
 
         foreach (var mod in target.GetModifiers<BaseModifier>())
@@ -440,6 +442,9 @@ public static class RuthlessRpcPatches
     /// </summary>
     public static bool SkipIfRuthlessFirstDeathShield(PlayerControl target, PlayerControl source)
     {
+        if (!OptionGroupSingleton<RuthlessOptions>.Instance.BypassFirstDeathShield)
+            return true;
+        
         if (IsRuthlessAttacker(source))
         {
             DivaniPlugin.Instance.Log.LogInfo("Ruthless: Skipping first-death shield check (void)");
