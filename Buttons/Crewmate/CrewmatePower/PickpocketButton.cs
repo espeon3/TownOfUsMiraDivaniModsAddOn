@@ -1,22 +1,29 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using MiraAPI.GameOptions;
 using MiraAPI.Hud;
 using MiraAPI.Modifiers;
 using MiraAPI.Modifiers.Types;
+using MiraAPI.Networking;
 using MiraAPI.Utilities;
 using MiraAPI.Utilities.Assets;
 using Reactor.Networking.Attributes;
+using Reactor.Utilities;
 using DivaniMods.Assets;
 using DivaniMods.Options;
 using DivaniMods.Patches;
 using DivaniMods.Roles.Crewmate.CrewmatePower;
 using DivaniMods.Utilities;
 using TownOfUs.Buttons;
+using TownOfUs.Events;
 using TownOfUs.Interfaces;
+using TownOfUs.Modules.Localization;
 using TownOfUs.Modifiers;
 using TownOfUs.Modifiers.Game;
+using TownOfUs.Modifiers.Game.Alliance;
+using TownOfUs.Utilities;
 using TownOfUs.Utilities.Appearances;
 using UnityEngine;
 
@@ -40,7 +47,6 @@ public class PickpocketButton : TownOfUsTargetButton<PlayerControl>
         "TownOfUs.Modifiers.Impostor",
         "TownOfUs.Modifiers.Game.Neutral",
         "TownOfUs.Modifiers.Game.Impostor",
-        "TownOfUs.Modifiers.Game.Alliance",
         "TownOfUs.Modifiers.HnsCrewmate",
         "TownOfUs.Modifiers.HnsImpostor",
         "TownOfUs.Modifiers.HnsGame"
@@ -224,6 +230,10 @@ public class PickpocketButton : TownOfUsTargetButton<PlayerControl>
             return false;
 
         if (IsButtonModifier(modifier) && HasButtonModifier(thief))
+            return false;
+        
+        // Cannot steal Lover when thief already a Lover (avoids double-pairing).
+        if (modifier.GetType().Name == "LoverModifier" && thief.HasModifier<LoverModifier>())
             return false;
         
         return true;
@@ -412,6 +422,18 @@ public class PickpocketButton : TownOfUsTargetButton<PlayerControl>
         var shieldSourcePlayer = GetShieldSourcePlayer(modifier);
         var wasMedicShield = IsMedicShieldModifierIl2Cpp(modifier);
         
+        // Capture lover partner before remove.
+        // TryGetModifier<LoverModifier> works on Il2Cpp wrappers (pattern match against
+        // BaseModifier does not).
+        PlayerControl? loverPartner = null;
+        bool isStealingLover = false;
+        if (target.TryGetModifier<LoverModifier>(out var existingLover) && existingLover.TypeId == modifierTypeId)
+        {
+            loverPartner = existingLover.OtherLover;
+            isStealingLover = true;
+            DivaniPlugin.Instance.Log.LogInfo($"Thief: Stealing Lover from {target.Data.PlayerName}; partner = {loverPartner?.Data?.PlayerName ?? "null"}");
+        }
+        
         target.RemoveModifier(modifierTypeId, null);
         
         if (target == PlayerControl.LocalPlayer)
@@ -424,18 +446,52 @@ public class PickpocketButton : TownOfUsTargetButton<PlayerControl>
         
         if (canUseModifier)
         {
-            if (shieldSourcePlayer != null)
+            // Lover path uses generic AddModifier<T> so we get the instance back to wire OtherLover
+            // (uint AddModifier returns void; matches LoverModifier.RpcSetOtherLover pattern).
+            if (isStealingLover && loverPartner != null)
             {
-                thief.AddModifier(modifierTypeId, shieldSourcePlayer);
+                var thiefLover = thief.AddModifier<LoverModifier>();
+                if (thiefLover != null)
+                {
+                    thiefLover.OtherLover = loverPartner;
+                    if (!thief.IsCrewmate() || !loverPartner.IsCrewmate())
+                    {
+                        thiefLover.ForceDisableTasks = true;
+                    }
+                }
+                
+                if (loverPartner.TryGetModifier<LoverModifier>(out var partnerLover))
+                {
+                    partnerLover.OtherLover = thief;
+                    if (!thief.IsCrewmate() || !loverPartner.IsCrewmate())
+                    {
+                        partnerLover.ForceDisableTasks = true;
+                    }
+                }
+                
+                if (loverPartner == PlayerControl.LocalPlayer)
+                {
+                    MiraAPI.Utilities.Helpers.CreateAndShowNotification(
+                        $"<b><color=#FF66CC>You are now in love with {thief.Data.PlayerName}!</color></b>",
+                        Color.white,
+                        new Vector3(0f, 1f, -20f));
+                }
             }
             else
             {
-                thief.AddModifier(modifierTypeId);
-            }
-            
-            if (wasMedicShield)
-            {
-                MedicShieldStolenPatch.ApplyStolenMedicShield(shieldSourcePlayer, thief);
+                if (shieldSourcePlayer != null)
+                {
+                    thief.AddModifier(modifierTypeId, shieldSourcePlayer);
+                }
+                else
+                {
+                    thief.AddModifier(modifierTypeId);
+                }
+                
+                if (wasMedicShield)
+                {
+                    MedicShieldStolenPatch.ApplyStolenMedicShield(shieldSourcePlayer, thief);
+                }
             }
             
             if (thief.Data.Role is ThiefRole thiefRole)
@@ -445,8 +501,11 @@ public class PickpocketButton : TownOfUsTargetButton<PlayerControl>
             
             if (thief == PlayerControl.LocalPlayer)
             {
+                var stolenMsg = isStealingLover && loverPartner != null
+                    ? $"<b><color=#FF66CC>Stole Lover! You are now in love with {loverPartner.Data.PlayerName}!</color></b>"
+                    : $"<b><color=#804D1A>Stole/Gained {displayName}!</color></b>";
                 MiraAPI.Utilities.Helpers.CreateAndShowNotification(
-                    $"<b><color=#804D1A>Stole/Gained {displayName}!</color></b>",
+                    stolenMsg,
                     Color.white,
                     new Vector3(0f, 1f, -20f));
                 
@@ -454,11 +513,85 @@ public class PickpocketButton : TownOfUsTargetButton<PlayerControl>
             }
             
             DivaniPlugin.Instance.Log.LogInfo($"Thief: {thief.Data.PlayerName} stole {displayName} from {target.Data.PlayerName}");
+            
+            // Heartbreak the old Lover (victim). Deferred via coroutine so the pair-swap
+            // RPC body fully completes first; otherwise the kill cascade can fire while
+            // victim still appears linked on some client and chain through to the thief.
+            // Runs on EVERY client locally (no host gate) so each client spawns the body
+            // and registers the death — same pattern as LoverEvents.PlayerDeathEventHandler.
+            if (isStealingLover
+                && OptionGroupSingleton<ThiefOptions>.Instance.StealingLoverHeartbreaksVictim
+                && target != null
+                && target.Data != null
+                && !target.Data.IsDead)
+            {
+                Coroutines.Start(HeartbreakOldLoverCoroutine(target));
+            }
         }
         else
         {
+            if (isStealingLover && loverPartner != null && loverPartner.HasModifier<LoverModifier>())
+            {
+                loverPartner.RemoveModifier<LoverModifier>();
+            }
+            
             DivaniPlugin.Instance.Log.LogInfo($"Thief: {thief.Data.PlayerName} destroyed {displayName} from {target.Data.PlayerName}, giving random modifier (id={fallbackRandomId}) instead");
             ApplyGivenModifier(thief, fallbackRandomId, prefix: "Stole/Gained");
+        }
+    }
+    
+    /// <summary>
+    /// Waits a short delay so the Lover pair-swap (thief.AddModifier + partner.OtherLover swap)
+    /// fully settles, then kills the old Lover with a Heartbroken cause on this client.
+    /// Mirrors LoverEvents.PlayerDeathEventHandler pattern: every client runs this locally
+    /// (no host gate) so each client spawns the body and shows the death.
+    /// </summary>
+    private static IEnumerator HeartbreakOldLoverCoroutine(PlayerControl victim)
+    {
+        yield return new WaitForSeconds(0.25f);
+        
+        if (victim == null || victim.Data == null || victim.Data.IsDead)
+        {
+            yield break;
+        }
+        
+        DivaniPlugin.Instance.Log.LogInfo($"Thief: Heartbreaking old Lover {victim.Data.PlayerName}");
+        
+        var inMeeting = MeetingHud.Instance != null || ExileController.Instance != null;
+        var heartbreakText = TouLocale.Get("DiedToHeartbreak");
+        
+        DeathHandlerModifier.UpdateDeathHandlerImmediate(
+            victim,
+            heartbreakText,
+            DeathEventHandlers.CurrentRound,
+            inMeeting ? DeathHandlerOverride.SetFalse : DeathHandlerOverride.SetTrue,
+            lockInfo: DeathHandlerOverride.SetTrue);
+        
+        // UpdateDeathHandlerImmediate is async. CustomMurder must not run until CauseOfDeath
+        // and LockInfo are written, or AfterMurderEventHandler overwrites with default "Killed"
+        // on remote clients (only the victim's own client tended to win the race before).
+        while (DeathHandlerModifier.IsAltCoroutineRunning)
+        {
+            yield return null;
+        }
+        
+        if (victim.TryGetModifier<DeathHandlerModifier>(out var deathHandler))
+        {
+            deathHandler.CauseOfDeath = heartbreakText;
+            deathHandler.RoundOfDeath = DeathEventHandlers.CurrentRound;
+            deathHandler.DiedThisRound = !inMeeting;
+            deathHandler.LockInfo = true;
+        }
+        
+        if (inMeeting)
+        {
+            victim.Exiled();
+        }
+        else
+        {
+            var showAnim = MeetingHud.Instance == null && ExileController.Instance == null;
+            var flags = MurderResultFlags.DecisionByHost | MurderResultFlags.Succeeded;
+            victim.CustomMurder(victim, flags, false, showAnim, false, showAnim, false);
         }
     }
 

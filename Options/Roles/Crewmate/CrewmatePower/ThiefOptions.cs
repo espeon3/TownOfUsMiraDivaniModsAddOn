@@ -17,4 +17,7 @@ public class ThiefOptions : AbstractOptionGroup<ThiefRole>
     
     [ModdedNumberOption("Pickpocket Range", 0.5f, 3f, 0.25f, MiraNumberSuffixes.Multiplier)]
     public float PickpocketRange { get; set; } = 1f;
+    
+    [ModdedToggleOption("Stealing Lover Breaks Their Heart")]
+    public bool StealingLoverHeartbreaksVictim { get; set; } = true;
 }
