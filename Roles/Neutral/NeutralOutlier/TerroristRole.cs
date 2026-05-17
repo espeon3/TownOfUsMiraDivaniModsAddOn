@@ -1,0 +1,120 @@
+using System;
+using System.Text;
+using AmongUs.GameOptions;
+using MiraAPI.GameOptions;
+using MiraAPI.Patches.Stubs;
+using MiraAPI.Roles;
+using DivaniMods.Assets;
+using DivaniMods.Options;
+using DivaniMods.Patches;
+using TownOfUs;
+using TownOfUs.Extensions;
+using TownOfUs.Modules.Localization;
+using TownOfUs.Modules.Wiki;
+using TownOfUs.Roles;
+using TownOfUs.Roles.Crewmate;
+using TownOfUs.Roles.Neutral;
+using TownOfUs.Utilities;
+using UnityEngine;
+
+namespace DivaniMods.Roles.Neutral.NeutralOutlier;
+
+/// <summary>
+/// Neutral Outlier — plants sabotages from utility consoles (admin/cams/vitals/doorlog).
+/// Wins solo after detonating the configured number of sabotages without anyone defusing
+/// them. Mutually exclusive with the impostor sabotage system (see TerroristSabotageState).
+/// </summary>
+public sealed class TerroristRole(IntPtr cppPtr)
+    : NeutralRole(cppPtr), ITownOfUsRole, IWikiDiscoverable, IDoomable, ICrewVariant
+{
+    public static readonly Color TerroristColor = new Color32(0x28, 0x36, 0x7D, 255);
+
+    public string RoleName => "Terrorist";
+    public string RoleDescription => "Plant sabotages to win!";
+    public string RoleLongDescription =>
+        "Plant at admin, security, vitals, or door log.\n" +
+        "If the crew defuses in time, it fails.";
+    public Color RoleColor => TerroristColor;
+    public ModdedRoleTeams Team => ModdedRoleTeams.Custom;
+    public RoleAlignment RoleAlignment => RoleAlignment.NeutralOutlier;
+
+    public DoomableType DoomHintType => DoomableType.Relentless;
+
+    public RoleBehaviour CrewVariant =>
+        RoleManager.Instance.GetRole((RoleTypes)RoleId.Get<EngineerTouRole>());
+
+    public string GetAdvancedDescription() => RoleLongDescription + MiscUtils.AppendOptionsText(GetType());
+
+    /// <summary>Spec: Terrorist has impostor vision.</summary>
+    public bool HasImpostorVision => true;
+
+    public CustomRoleConfiguration Configuration => new(this)
+    {
+        Icon = DivaniAssets.TerroristIcon,
+        IntroSound = DivaniAssets.TerroristIntroSound,
+        MaxRoleCount = 1,
+        CanUseVent = OptionGroupSingleton<TerroristOptions>.Instance.CanVent,
+        // Required so on death the role swaps to NeutralGhostRole and the solo
+        // win condition keeps tracking the planted-sabotage counter; mirrors the
+        // pattern Frag / Plague Doctor / Opportunist already use.
+        GhostRole = (RoleTypes)RoleId.Get<NeutralGhostRole>(),
+    };
+
+    public override void SpawnTaskHeader(PlayerControl playerControl)
+    {
+        if (playerControl != PlayerControl.LocalPlayer)
+        {
+            return;
+        }
+        var task = PlayerTask.GetOrCreateTask<ImportantTextTask>(playerControl, 0);
+        task.Text =
+            $"{TownOfUsColors.Neutral.ToTextColor()}{TouLocale.GetParsed("NeutralOutlierTaskHeader")}</color>";
+        task.name = "NeutralRoleText";
+    }
+
+    public StringBuilder SetTabText()
+    {
+        var stringB = ITownOfUsRole.SetNewTabText(this);
+        var needed = (int)OptionGroupSingleton<TerroristOptions>.Instance.SabotagesToWin;
+        var capped = Math.Min(TerroristSabotageState.SuccessfulSabotages, needed);
+        stringB.AppendLine(TownOfUsPlugin.Culture, $"<b>Successful sabotages: {capped}/{needed}</b>");
+        return stringB;
+    }
+
+    public override void Initialize(PlayerControl targetPlayer)
+    {
+        RoleBehaviourStubs.Initialize(this, targetPlayer);
+        TerroristSabotageState.RegisterTerrorist(targetPlayer);
+    }
+
+    public override void Deinitialize(PlayerControl targetPlayer)
+    {
+        RoleBehaviourStubs.Deinitialize(this, targetPlayer);
+        TouRoleUtils.ClearTaskHeader(Player);
+    }
+
+    public override bool CanUse(IUsable usable)
+    {
+        if (!GameManager.Instance.LogicUsables.CanUse(usable, Player))
+        {
+            return false;
+        }
+        var console = usable.TryCast<Console>()!;
+        return console == null || console.AllowImpostor;
+    }
+
+    /// <summary>
+    /// Solo win: detonated the configured number of sabotages without them being defused.
+    /// Tracked in <see cref="TerroristSabotageState"/>.
+    /// </summary>
+    public bool WinConditionMet()
+    {
+        var needed = (int)OptionGroupSingleton<TerroristOptions>.Instance.SabotagesToWin;
+        return TerroristSabotageState.SuccessfulSabotages >= needed;
+    }
+
+    public override bool DidWin(GameOverReason gameOverReason)
+    {
+        return WinConditionMet();
+    }
+}
