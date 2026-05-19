@@ -8,7 +8,7 @@
     
     <AssemblyName>DivaniMods</AssemblyName>
     <RootNamespace>DivaniMods</RootNamespace>
-    <Version>1.2.1</Version>
+    <Version>1.2.2</Version>
     <!--
       TownOfUs + TouMiraRolesExtension live in-repo for reference only. Do not compile them here:
       this project already references TownOfUsMira.dll from BepInEx. Compiling sources duplicates
@@ -133,6 +133,8 @@
     <EmbeddedResource Include="Resources\Icons\Shuffle.png" />
     <EmbeddedResource Include="Resources\Icons\Beartrap.png" />
     <EmbeddedResource Include="Resources\Icons\Bloody.png" />
+    <EmbeddedResource Include="Resources\Icons\Terrorist.png" />
+    <EmbeddedResource Include="Resources\TerroristSabotageButton.png" />
     <!-- Audio clips must be WAV - loaded via MiraAPI's LoadableAudioResourceAsset,
          matching how TouMiraRolesExtension ships its sounds. -->
     <EmbeddedResource Include="Resources\FragileBreak.wav" />
@@ -152,6 +154,8 @@
     <EmbeddedResource Include="Resources\Banners\DivaniModNewsLogo.png" />
     <EmbeddedResource Include="Resources\Banners\DivaniModsLogoNew.png" Condition="Exists('Resources\Banners\DivaniModsLogoNew.png')" />
     <EmbeddedResource Include="Resources\OpportunistIntro.wav" />
+    <EmbeddedResource Include="Resources\TerroristIntro.wav" />
+    <EmbeddedResource Include="Resources\TerroristExplosion.wav" />
     <EmbeddedResource Include="Resources\Announcements\modNews-en_US.json" />
     <EmbeddedResource Include="Resources\RecruitMeetingCrewmate.png" />
     <EmbeddedResource Include="Resources\RecruitMeetingImpostor.png" />
