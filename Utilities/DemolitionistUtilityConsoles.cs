@@ -3,6 +3,7 @@ using System.Reflection;
 using AmongUs.GameOptions;
 using DivaniMods.Patches;
 using Il2CppInterop.Runtime;
+using TownOfUs.Utilities;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -35,7 +36,8 @@ public static class DemolitionistUtilityConsoles
         kind switch
         {
             DemolitionistUtilityKind.Admin => "Admin Table",
-            DemolitionistUtilityKind.Cameras => "Security",
+            // Fungle's "camera" console is the telescope/Lookout, not a Security room.
+            DemolitionistUtilityKind.Cameras => MiscUtils.GetCurrentMap == ExpandedMapNames.Fungle ? "Lookout" : "Security",
             DemolitionistUtilityKind.Vitals => "Vitals",
             DemolitionistUtilityKind.DoorLog => "Door Log",
             _ => "Unknown",
