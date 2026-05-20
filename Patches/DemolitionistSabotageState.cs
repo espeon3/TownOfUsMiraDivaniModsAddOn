@@ -32,11 +32,11 @@ namespace DivaniMods.Patches;
 
 /// <summary>
 
-/// Shared state + RPC entry points for the Terrorist sabotage.
+/// Shared state + RPC entry points for the Demolitionist sabotage.
 
 /// </summary>
 
-public static class TerroristSabotageState
+public static class DemolitionistSabotageState
 
 {
 
@@ -46,13 +46,13 @@ public static class TerroristSabotageState
 
     public static bool IsActive { get; private set; }
 
-    public static byte TerroristId { get; private set; } = NoPlayer;
+    public static byte DemolitionistId { get; private set; } = NoPlayer;
 
     public static Vector2 PlantedPosition { get; private set; }
 
     public static int PlantedConsoleKey { get; private set; }
 
-    public static TerroristUtilityKind PlantedUtilityKind { get; private set; }
+    public static DemolitionistUtilityKind PlantedUtilityKind { get; private set; }
 
     public static string PlantedLocationName { get; private set; } = string.Empty;
 
@@ -76,9 +76,9 @@ public static class TerroristSabotageState
 
     private static readonly Color ExplosionFlashColor = Palette.ImpostorRed;
 
-    private static readonly List<(int ConsoleKey, TerroristUtilityKind Kind)> DisabledUtilities = new();
+    private static readonly List<(int ConsoleKey, DemolitionistUtilityKind Kind)> DisabledUtilities = new();
 
-    private static TerroristSabotageTask? _localTask;
+    private static DemolitionistSabotageTask? _localTask;
 
     private static ArrowBehaviour? _arrow;
 
@@ -90,11 +90,11 @@ public static class TerroristSabotageState
 
 
 
-    public static void RegisterTerrorist(PlayerControl terrorist)
+    public static void RegisterDemolitionist(PlayerControl demolitionist)
 
     {
 
-        TerroristId = terrorist.PlayerId;
+        DemolitionistId = demolitionist.PlayerId;
 
     }
 
@@ -108,7 +108,7 @@ public static class TerroristSabotageState
 
         SuccessfulSabotages = 0;
 
-        TerroristId = NoPlayer;
+        DemolitionistId = NoPlayer;
 
         LocalPlantInProgress = false;
 
@@ -118,12 +118,12 @@ public static class TerroristSabotageState
 
         DisabledUtilities.Clear();
 
-        TerroristUtilityConsoles.InvalidateCache();
-        TerroristNumpad.Controller.ResetAll();
+        DemolitionistUtilityConsoles.InvalidateCache();
+        DemolitionistNumpad.Controller.ResetAll();
 
     }
 
-    public static bool IsUtilityDisabled(int consoleKey, TerroristUtilityKind kind)
+    public static bool IsUtilityDisabled(int consoleKey, DemolitionistUtilityKind kind)
     {
         foreach (var entry in DisabledUtilities)
         {
@@ -136,7 +136,7 @@ public static class TerroristSabotageState
         return false;
     }
 
-    private static void RegisterDisabledUtility(int consoleKey, TerroristUtilityKind kind)
+    private static void RegisterDisabledUtility(int consoleKey, DemolitionistUtilityKind kind)
     {
         if (IsUtilityDisabled(consoleKey, kind))
         {
@@ -159,20 +159,20 @@ public static class TerroristSabotageState
 
     public static bool TryGetPlantedWorldPosition(out Vector3 worldPos)
     {
-        return TerroristUtilityConsoles.TryGetWorldPosition(PlantedUtilityKind, PlantedPosition, out worldPos);
+        return DemolitionistUtilityConsoles.TryGetWorldPosition(PlantedUtilityKind, PlantedPosition, out worldPos);
     }
 
 
 
-    [MethodRpc((uint)DivaniRpcCalls.TerroristPlantSabotage)]
+    [MethodRpc((uint)DivaniRpcCalls.DemolitionistPlantSabotage)]
     public static void RpcPlantSabotage(
-        PlayerControl sender, byte terroristId, float x, float y, float duration, int consoleKey, byte utilityKind)
+        PlayerControl sender, byte demolitionistId, float x, float y, float duration, int consoleKey, byte utilityKind)
     {
-        var resolvedTerroristId = sender != null ? sender.PlayerId : terroristId;
-        PlantSabotage(resolvedTerroristId, new Vector2(x, y), duration, consoleKey, (TerroristUtilityKind)utilityKind);
+        var resolvedDemolitionistId = sender != null ? sender.PlayerId : demolitionistId;
+        PlantSabotage(resolvedDemolitionistId, new Vector2(x, y), duration, consoleKey, (DemolitionistUtilityKind)utilityKind);
     }
 
-    [MethodRpc((uint)DivaniRpcCalls.TerroristDefuseSabotage)]
+    [MethodRpc((uint)DivaniRpcCalls.DemolitionistDefuseSabotage)]
     public static void RpcDefuseSabotage(PlayerControl sender, byte defuserId)
     {
         var resolvedDefuserId = sender != null ? sender.PlayerId : defuserId;
@@ -181,7 +181,7 @@ public static class TerroristSabotageState
 
 
 
-    [MethodRpc((uint)DivaniRpcCalls.TerroristSabotageExpired)]
+    [MethodRpc((uint)DivaniRpcCalls.DemolitionistSabotageExpired)]
 
     public static void RpcSabotageExpired(PlayerControl sender)
 
@@ -194,17 +194,17 @@ public static class TerroristSabotageState
 
 
     private static void PlantSabotage(
-        byte terroristId, Vector2 position, float duration, int consoleKey, TerroristUtilityKind utilityKind)
+        byte demolitionistId, Vector2 position, float duration, int consoleKey, DemolitionistUtilityKind utilityKind)
 
     {
 
         if (IsActive) ClearActiveSabotage();
 
-        TerroristUtilityConsoles.InvalidateCache();
+        DemolitionistUtilityConsoles.InvalidateCache();
 
         IsActive = true;
 
-        TerroristId = terroristId;
+        DemolitionistId = demolitionistId;
 
         PlantedPosition = position;
 
@@ -212,13 +212,13 @@ public static class TerroristSabotageState
 
         PlantedUtilityKind = utilityKind;
 
-        PlantedLocationName = TerroristUtilityConsoles.GetDisplayName(utilityKind);
+        PlantedLocationName = DemolitionistUtilityConsoles.GetDisplayName(utilityKind);
 
         TimeRemaining = duration;
 
         FlashPulseIndex = 0;
 
-        TerroristUtilityConsoles.InvalidateCache();
+        DemolitionistUtilityConsoles.InvalidateCache();
 
         CreateArrowToTarget();
 
@@ -230,17 +230,17 @@ public static class TerroristSabotageState
 
 
 
-        var colorHex = ColorUtility.ToHtmlStringRGB(TerroristRole.TerroristColor);
+        var colorHex = ColorUtility.ToHtmlStringRGB(DemolitionistRole.DemolitionistColor);
 
         MiraAPI.Utilities.Helpers.CreateAndShowNotification(
 
-            $"<b><color=#{colorHex}>Terrorist Sabotage active\nLocation: {PlantedLocationName}</color></b>",
+            $"<b><color=#{colorHex}>Demolitionist Sabotage active\nLocation: {PlantedLocationName}</color></b>",
 
             Color.white,
 
             new Vector3(0f, 1f, -20f),
 
-            spr: DivaniAssets.TerroristSabotageButton.LoadAsset());
+            spr: DivaniAssets.DemolitionistSabotageButton.LoadAsset());
 
         EnsureTickRunning();
 
@@ -258,20 +258,20 @@ public static class TerroristSabotageState
 
         PlayResultFlash(DefuseFlashColor);
 
-        var colorHex = ColorUtility.ToHtmlStringRGB(TerroristRole.TerroristColor);
+        var colorHex = ColorUtility.ToHtmlStringRGB(DemolitionistRole.DemolitionistColor);
 
         MiraAPI.Utilities.Helpers.CreateAndShowNotification(
 
-            $"<b><color=#{colorHex}>Terrorist Sabotage Defused\nLocation: {location}</color></b>",
+            $"<b><color=#{colorHex}>Demolitionist Sabotage Defused\nLocation: {location}</color></b>",
 
             Color.white,
 
             new Vector3(0f, 1f, -20f),
 
-            spr: DivaniAssets.TerroristSabotageButton.LoadAsset());
+            spr: DivaniAssets.DemolitionistSabotageButton.LoadAsset());
 
         ClearActiveSabotage();
-        TerroristPlantButton.SyncAfterSabotageEnded(startCooldown: true);
+        DemolitionistPlantButton.SyncAfterSabotageEnded(startCooldown: true);
     }
 
     private static void ExpireSabotage()
@@ -288,7 +288,7 @@ public static class TerroristSabotageState
 
         SuccessfulSabotages++;
 
-        var needed = (int)OptionGroupSingleton<TerroristOptions>.Instance.SabotagesToWin;
+        var needed = (int)OptionGroupSingleton<DemolitionistOptions>.Instance.SabotagesToWin;
 
         var remaining = Mathf.Max(0, needed - SuccessfulSabotages);
 
@@ -298,25 +298,25 @@ public static class TerroristSabotageState
 
         PlayExplosionSound();
 
-        var colorHex = ColorUtility.ToHtmlStringRGB(TerroristRole.TerroristColor);
+        var colorHex = ColorUtility.ToHtmlStringRGB(DemolitionistRole.DemolitionistColor);
 
         var progress = remaining > 0
 
             ? $" ({SuccessfulSabotages}/{needed})"
 
-            : " — Terrorist goal reached!";
+            : " — Demolitionist goal reached!";
 
         MiraAPI.Utilities.Helpers.CreateAndShowNotification(
 
-            $"<b><color=#{colorHex}>Terrorist Exploded {location}{progress}</color></b>",
+            $"<b><color=#{colorHex}>Demolitionist Exploded {location}{progress}</color></b>",
 
             Color.white,
 
             new Vector3(0f, 1f, -20f),
 
-            spr: DivaniAssets.TerroristSabotageButton.LoadAsset());
+            spr: DivaniAssets.DemolitionistSabotageButton.LoadAsset());
 
-        if (OptionGroupSingleton<TerroristOptions>.Instance.DisableExplodedConsoles)
+        if (OptionGroupSingleton<DemolitionistOptions>.Instance.DisableExplodedConsoles)
 
         {
 
@@ -329,7 +329,7 @@ public static class TerroristSabotageState
         KillLocalIfDefusing();
 
         ClearActiveSabotage();
-        TerroristPlantButton.SyncAfterSabotageEnded(startCooldown: true);
+        DemolitionistPlantButton.SyncAfterSabotageEnded(startCooldown: true);
     }
 
     /// <summary>
@@ -338,12 +338,12 @@ public static class TerroristSabotageState
     /// </summary>
     private static void KillLocalIfDefusing()
     {
-        if (!OptionGroupSingleton<TerroristOptions>.Instance.ExplosionKillsDefusers)
+        if (!OptionGroupSingleton<DemolitionistOptions>.Instance.ExplosionKillsDefusers)
         {
             return;
         }
 
-        if (!TerroristDefuseButton.IsLocalDefusing)
+        if (!DemolitionistDefuseButton.IsLocalDefusing)
         {
             return;
         }
@@ -354,9 +354,9 @@ public static class TerroristSabotageState
             return;
         }
 
-        if (TerroristNumpad.Controller.InProgress)
+        if (DemolitionistNumpad.Controller.InProgress)
         {
-            TerroristNumpad.Controller.CancelActive();
+            DemolitionistNumpad.Controller.CancelActive();
         }
 
         local.RpcCustomMurder(local, MeetingCheck.OutsideMeeting);
@@ -366,20 +366,20 @@ public static class TerroristSabotageState
     /// Force-close any open minigame matching the exploded utility kind. Runs on every client
     /// (each closes their own open minigame), so anyone inside the console is ejected.
     /// </summary>
-    private static void EjectFromExplodedUtility(TerroristUtilityKind kind)
+    private static void EjectFromExplodedUtility(DemolitionistUtilityKind kind)
     {
         switch (kind)
         {
-            case TerroristUtilityKind.Admin:
+            case DemolitionistUtilityKind.Admin:
                 var map = MapBehaviour.Instance;
                 if (map != null && map.IsOpen)
                 {
                     map.Close();
                 }
                 break;
-            case TerroristUtilityKind.Cameras:
-            case TerroristUtilityKind.Vitals:
-            case TerroristUtilityKind.DoorLog:
+            case DemolitionistUtilityKind.Cameras:
+            case DemolitionistUtilityKind.Vitals:
+            case DemolitionistUtilityKind.DoorLog:
                 var mg = Minigame.Instance;
                 if (mg == null)
                 {
@@ -388,10 +388,10 @@ public static class TerroristSabotageState
 
                 var matches = kind switch
                 {
-                    TerroristUtilityKind.Cameras => mg.TryCast<SurveillanceMinigame>() != null
+                    DemolitionistUtilityKind.Cameras => mg.TryCast<SurveillanceMinigame>() != null
                         || mg.TryCast<PlanetSurveillanceMinigame>() != null,
-                    TerroristUtilityKind.Vitals => mg.TryCast<VitalsMinigame>() != null,
-                    TerroristUtilityKind.DoorLog => mg.TryCast<SecurityLogGame>() != null,
+                    DemolitionistUtilityKind.Vitals => mg.TryCast<VitalsMinigame>() != null,
+                    DemolitionistUtilityKind.DoorLog => mg.TryCast<SecurityLogGame>() != null,
                     _ => false,
                 };
 
@@ -414,7 +414,7 @@ public static class TerroristSabotageState
 
         PlantedConsoleKey = 0;
 
-        PlantedUtilityKind = TerroristUtilityKind.None;
+        PlantedUtilityKind = DemolitionistUtilityKind.None;
 
 
 
@@ -466,7 +466,7 @@ public static class TerroristSabotageState
 
             var local = PlayerControl.LocalPlayer;
 
-            if (local != null && local.PlayerId == TerroristId)
+            if (local != null && local.PlayerId == DemolitionistId)
 
             {
 
@@ -506,7 +506,7 @@ public static class TerroristSabotageState
 
 
 
-        return TerroristUtilityConsoles.IsAtPlantedUtility(
+        return DemolitionistUtilityConsoles.IsAtPlantedUtility(
             local, PlantedUtilityKind, PlantedPosition, PlantedConsoleKey);
 
     }
@@ -561,11 +561,11 @@ public static class TerroristSabotageState
 
 
 
-        var go = new GameObject("TerroristSabotageTask");
+        var go = new GameObject("DemolitionistSabotageTask");
 
         go.transform.SetParent(local.transform);
 
-        _localTask = go.AddComponent<TerroristSabotageTask>();
+        _localTask = go.AddComponent<DemolitionistSabotageTask>();
 
         _localTask.Owner = local;
 
@@ -645,7 +645,7 @@ public static class TerroristSabotageState
 
     /// <summary>Alternates with screen flash / task list (primary blue, secondary gold).</summary>
     private static Color GetCurrentPulseColor() =>
-        (FlashPulseIndex & 1) == 0 ? TerroristRole.TerroristColor : SecondaryColor;
+        (FlashPulseIndex & 1) == 0 ? DemolitionistRole.DemolitionistColor : SecondaryColor;
 
     private static void ApplyArrowColor()
 
@@ -877,7 +877,7 @@ public static class TerroristSabotageState
 
         {
 
-            var clip = DivaniAssets.TerroristExplosionSound.LoadAsset();
+            var clip = DivaniAssets.DemolitionistExplosionSound.LoadAsset();
 
             if (clip != null)
 

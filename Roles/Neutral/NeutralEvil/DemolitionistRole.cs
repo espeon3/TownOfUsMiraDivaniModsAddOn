@@ -26,19 +26,19 @@ namespace DivaniMods.Roles.Neutral.NeutralEvil;
 /// <summary>
 /// Neutral Evil — plants sabotages from utility consoles (admin/cams/vitals/doorlog).
 /// Wins solo after detonating the configured number of sabotages without anyone defusing
-/// them. Mutually exclusive with the impostor sabotage system (see TerroristSabotageState).
+/// them. Mutually exclusive with the impostor sabotage system (see DemolitionistSabotageState).
 /// </summary>
-public sealed class TerroristRole(IntPtr cppPtr)
+public sealed class DemolitionistRole(IntPtr cppPtr)
     : NeutralRole(cppPtr), ITownOfUsRole, IWikiDiscoverable, IDoomable, ICrewVariant
 {
-    public static readonly Color TerroristColor = new Color32(0x28, 0x36, 0x7D, 255);
+    public static readonly Color DemolitionistColor = new Color32(0x28, 0x36, 0x7D, 255);
 
-    public string RoleName => "Terrorist";
+    public string RoleName => "Demolitionist";
     public string RoleDescription => "Plant sabotages to win!";
     public string RoleLongDescription =>
         "Plant at admin, security, vitals, or door log.\n" +
         "If the crew defuses in time, it fails.";
-    public Color RoleColor => TerroristColor;
+    public Color RoleColor => DemolitionistColor;
     public ModdedRoleTeams Team => ModdedRoleTeams.Custom;
     public RoleAlignment RoleAlignment => RoleAlignment.NeutralEvil;
 
@@ -49,15 +49,15 @@ public sealed class TerroristRole(IntPtr cppPtr)
 
     public string GetAdvancedDescription() => RoleLongDescription + MiscUtils.AppendOptionsText(GetType());
 
-    /// <summary>Spec: Terrorist has impostor vision.</summary>
+    /// <summary>Spec: Demolitionist has impostor vision.</summary>
     public bool HasImpostorVision => true;
 
     public CustomRoleConfiguration Configuration => new(this)
     {
-        Icon = DivaniAssets.TerroristIcon,
-        IntroSound = DivaniAssets.TerroristIntroSound,
+        Icon = DivaniAssets.DemolitionistIcon,
+        IntroSound = DivaniAssets.DemolitionistIntroSound,
         MaxRoleCount = 1,
-        CanUseVent = OptionGroupSingleton<TerroristOptions>.Instance.CanVent,
+        CanUseVent = OptionGroupSingleton<DemolitionistOptions>.Instance.CanVent,
         // Required so on death the role swaps to NeutralGhostRole and the solo
         // win condition keeps tracking the planted-sabotage counter; mirrors the
         // pattern Frag / Plague Doctor / Opportunist already use.
@@ -80,8 +80,8 @@ public sealed class TerroristRole(IntPtr cppPtr)
     public StringBuilder SetTabText()
     {
         var stringB = ITownOfUsRole.SetNewTabText(this);
-        var needed = (int)OptionGroupSingleton<TerroristOptions>.Instance.SabotagesToWin;
-        var capped = Math.Min(TerroristSabotageState.SuccessfulSabotages, needed);
+        var needed = (int)OptionGroupSingleton<DemolitionistOptions>.Instance.SabotagesToWin;
+        var capped = Math.Min(DemolitionistSabotageState.SuccessfulSabotages, needed);
         stringB.AppendLine(TownOfUsPlugin.Culture, $"<b>Successful sabotages: {capped}/{needed}</b>");
         return stringB;
     }
@@ -95,11 +95,11 @@ public sealed class TerroristRole(IntPtr cppPtr)
         if (Player.AmOwner)
         {
             HudManager.Instance.ImpostorVentButton.graphic.sprite = TouAssets.VentSprite.LoadAsset();
-            HudManager.Instance.ImpostorVentButton.buttonLabelText.SetOutlineColor(TerroristColor);
+            HudManager.Instance.ImpostorVentButton.buttonLabelText.SetOutlineColor(DemolitionistColor);
             CustomButtonSingleton<FakeVentButton>.Instance.Show = false;
         }
 
-        TerroristSabotageState.RegisterTerrorist(targetPlayer);
+        DemolitionistSabotageState.RegisterDemolitionist(targetPlayer);
     }
 
     public override void Deinitialize(PlayerControl targetPlayer)
@@ -128,12 +128,12 @@ public sealed class TerroristRole(IntPtr cppPtr)
 
     /// <summary>
     /// Solo win: detonated the configured number of sabotages without them being defused.
-    /// Tracked in <see cref="TerroristSabotageState"/>.
+    /// Tracked in <see cref="DemolitionistSabotageState"/>.
     /// </summary>
     public bool WinConditionMet()
     {
-        var needed = (int)OptionGroupSingleton<TerroristOptions>.Instance.SabotagesToWin;
-        return TerroristSabotageState.SuccessfulSabotages >= needed;
+        var needed = (int)OptionGroupSingleton<DemolitionistOptions>.Instance.SabotagesToWin;
+        return DemolitionistSabotageState.SuccessfulSabotages >= needed;
     }
 
     public override bool DidWin(GameOverReason gameOverReason)

@@ -9,11 +9,11 @@ using TownOfUs.Utilities;
 
 namespace DivaniMods.Options;
 
-public class TerroristOptions : AbstractOptionGroup<TerroristRole>, IWikiOptionsSummaryProvider
+public class DemolitionistOptions : AbstractOptionGroup<DemolitionistRole>, IWikiOptionsSummaryProvider
 {
-    public override string GroupName => "Terrorist";
+    public override string GroupName => "Demolitionist";
 
-    /// <summary>Sabotages the Terrorist must successfully detonate to win alone.</summary>
+    /// <summary>Sabotages the Demolitionist must successfully detonate to win alone.</summary>
     [ModdedNumberOption("Successful Sabotages To Win", 1f, 4f, 1f)]
     public float SabotagesToWin { get; set; } = 2f;
 
@@ -62,24 +62,24 @@ public class TerroristOptions : AbstractOptionGroup<TerroristRole>, IWikiOptions
 
     public ModdedEnumOption SabotageStyle { get; } = new(
         "Sabotage Style",
-        (int)TerroristSabotageStyle.Timed,
-        typeof(TerroristSabotageStyle));
+        (int)DemolitionistSabotageStyle.Timed,
+        typeof(DemolitionistSabotageStyle));
 
-    /// <summary>Time the Terrorist must hold to finish the Plant action.</summary>
+    /// <summary>Time the Demolitionist must hold to finish the Plant action.</summary>
     public ModdedNumberOption PlantTime { get; } = new(
         "Plant Time", 5f, 2f, 10f, 1f, MiraNumberSuffixes.Seconds)
     {
-        Visible = () => OptionGroupSingleton<TerroristOptions>.Instance.IsTimedSabotageStyle,
+        Visible = () => OptionGroupSingleton<DemolitionistOptions>.Instance.IsTimedSabotageStyle,
     };
 
     /// <summary>Time required to defuse a planted sabotage.</summary>
     public ModdedNumberOption DefuseTime { get; } = new(
         "Defuse Time", 5f, 2f, 10f, 1f, MiraNumberSuffixes.Seconds)
     {
-        Visible = () => OptionGroupSingleton<TerroristOptions>.Instance.IsTimedSabotageStyle,
+        Visible = () => OptionGroupSingleton<DemolitionistOptions>.Instance.IsTimedSabotageStyle,
     };
 
-    [ModdedToggleOption("Terrorist Can Vent")]
+    [ModdedToggleOption("Demolitionist Can Vent")]
     public bool CanVent { get; set; } = false;
 
     /// <summary>After a sabotage explodes, that utility cannot be used by anyone for the rest of the game.</summary>
@@ -91,7 +91,7 @@ public class TerroristOptions : AbstractOptionGroup<TerroristRole>, IWikiOptions
     [ModdedToggleOption("Explosion Kills Active Defusers")]
     public bool ExplosionKillsDefusers { get; set; } = false;
 
-    public bool IsTimedSabotageStyle => (TerroristSabotageStyle)SabotageStyle.Value is TerroristSabotageStyle.Timed;
+    public bool IsTimedSabotageStyle => (DemolitionistSabotageStyle)SabotageStyle.Value is DemolitionistSabotageStyle.Timed;
 
     public IReadOnlySet<StringNames> WikiHiddenOptionKeys =>
         ShipStatus.Instance != null
@@ -172,7 +172,7 @@ public class TerroristOptions : AbstractOptionGroup<TerroristRole>, IWikiOptions
     }
 }
 
-public enum TerroristSabotageStyle
+public enum DemolitionistSabotageStyle
 {
     Timed,
     Numpad,

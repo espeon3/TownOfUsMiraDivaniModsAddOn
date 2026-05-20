@@ -8,12 +8,12 @@ using UnityEngine;
 namespace DivaniMods.Patches;
 
 /// <summary>
-/// Vanilla <see cref="SabotageTask"/> on each client while Terrorist sabotage is
+/// Vanilla <see cref="SabotageTask"/> on each client while Demolitionist sabotage is
 /// active — implements <see cref="IHudOverrideTask"/> (blocks meetings). Emergency
-/// table UX is handled in <see cref="TerroristPatches"/> like vanilla sabos.
+/// table UX is handled in <see cref="DemolitionistPatches"/> like vanilla sabos.
 /// </summary>
 [RegisterInIl2Cpp]
-public sealed class TerroristSabotageTask(nint cppPtr) : SabotageTask(cppPtr)
+public sealed class DemolitionistSabotageTask(nint cppPtr) : SabotageTask(cppPtr)
 {
     public override int TaskStep => _isComplete ? 1 : 0;
     public override bool IsComplete => _isComplete;
@@ -27,20 +27,20 @@ public sealed class TerroristSabotageTask(nint cppPtr) : SabotageTask(cppPtr)
 
     public override void AppendTaskText(Il2CppSystem.Text.StringBuilder sb)
     {
-        if (!TerroristSabotageState.IsActive)
+        if (!DemolitionistSabotageState.IsActive)
         {
             return;
         }
 
-        var color = (TerroristSabotageState.FlashPulseIndex & 1) == 0
-            ? TerroristRole.TerroristColor
-            : TerroristSabotageState.SecondaryColor;
-        var location = TerroristSabotageState.PlantedLocationName;
-        var seconds = Mathf.CeilToInt(TerroristSabotageState.TimeRemaining);
+        var color = (DemolitionistSabotageState.FlashPulseIndex & 1) == 0
+            ? DemolitionistRole.DemolitionistColor
+            : DemolitionistSabotageState.SecondaryColor;
+        var location = DemolitionistSabotageState.PlantedLocationName;
+        var seconds = Mathf.CeilToInt(DemolitionistSabotageState.TimeRemaining);
         var hex = ColorUtility.ToHtmlStringRGB(color);
 
         sb.AppendLine(
-            $"<color=#{hex}>Terrorist Sabotage active\nLocation: {location}\n{seconds}s</color>");
+            $"<color=#{hex}>Demolitionist Sabotage active\nLocation: {location}\n{seconds}s</color>");
     }
 
     public override void Complete()

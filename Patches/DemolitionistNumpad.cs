@@ -17,7 +17,7 @@ using Object = UnityEngine.Object;
 
 namespace DivaniMods.Patches;
 
-internal enum TerroristNumpadAction
+internal enum DemolitionistNumpadAction
 {
     None,
     Plant,
@@ -27,7 +27,7 @@ internal enum TerroristNumpadAction
 /// <summary>
 /// Numpad plant/defuse flow: session controller, keypad Harmony patches, fake O₂ task.
 /// </summary>
-internal static class TerroristNumpad
+internal static class DemolitionistNumpad
 {
     public static void Register(Harmony harmony, ManualLogSource log) => Keypad.Register(harmony, log);
 
@@ -35,16 +35,16 @@ internal static class TerroristNumpad
 
     internal static class Controller
     {
-        private static TerroristKeypadNoOxyTask? _task;
+        private static DemolitionistKeypadNoOxyTask? _task;
         private static Minigame? _minigame;
-        private static TerroristNumpadAction _action;
+        private static DemolitionistNumpadAction _action;
         private static Vector2 _plantPosition;
         private static int _plantConsoleKey;
-        private static TerroristUtilityKind _plantKind;
+        private static DemolitionistUtilityKind _plantKind;
         private static bool _numpadSessionCancelled;
         private static int _openNumpadSessionId;
         public static bool InProgress => _task != null;
-        public static bool DefuseInProgress => _task != null && _action == TerroristNumpadAction.Defuse;
+        public static bool DefuseInProgress => _task != null && _action == DemolitionistNumpadAction.Defuse;
 
         internal static int ActiveOpenNumpadSessionId => _openNumpadSessionId;
 
@@ -52,10 +52,10 @@ internal static class TerroristNumpad
         {
             CleanupTaskAndMinigame();
             _numpadSessionCancelled = false;
-            _action = TerroristNumpadAction.None;
+            _action = DemolitionistNumpadAction.None;
             _plantPosition = Vector2.zero;
             _plantConsoleKey = 0;
-            _plantKind = TerroristUtilityKind.None;
+            _plantKind = DemolitionistUtilityKind.None;
         }
 
         internal static void ResetKeypadUiState(KeypadGame game)
@@ -71,9 +71,9 @@ internal static class TerroristNumpad
             }
         }
 
-        public static bool TryGetTerroristNumpadSession(KeypadGame? keypad, out TerroristKeypadNoOxyTask? terroristNumpadSabotage)
+        public static bool TryGetDemolitionistNumpadSession(KeypadGame? keypad, out DemolitionistKeypadNoOxyTask? demolitionistNumpadSabotage)
         {
-            terroristNumpadSabotage = null;
+            demolitionistNumpadSabotage = null;
             if (keypad == null || _task == null)
             {
                 return false;
@@ -81,7 +81,7 @@ internal static class TerroristNumpad
 
             if (_minigame != null && SameMinigameInstance(keypad, _minigame))
             {
-                terroristNumpadSabotage = _task;
+                demolitionistNumpadSabotage = _task;
                 return true;
             }
 
@@ -89,7 +89,7 @@ internal static class TerroristNumpad
                 && SameMinigameInstance(keypad, Minigame.Instance)
                 && keypad.TryCast<KeypadGame>() != null)
             {
-                terroristNumpadSabotage = _task;
+                demolitionistNumpadSabotage = _task;
                 return true;
             }
 
@@ -100,9 +100,9 @@ internal static class TerroristNumpad
             PlayerControl player,
             Vector2 position,
             int consoleKey,
-            TerroristUtilityKind kind)
+            DemolitionistUtilityKind kind)
         {
-            if (player == null || kind == TerroristUtilityKind.None)
+            if (player == null || kind == DemolitionistUtilityKind.None)
             {
                 return false;
             }
@@ -111,19 +111,19 @@ internal static class TerroristNumpad
             _plantPosition = position;
             _plantConsoleKey = consoleKey;
             _plantKind = kind;
-            return Open(player, TerroristNumpadAction.Plant);
+            return Open(player, DemolitionistNumpadAction.Plant);
         }
 
         public static bool OpenDefuse(PlayerControl player)
         {
             CleanupTaskAndMinigame();
-            return player != null && Open(player, TerroristNumpadAction.Defuse);
+            return player != null && Open(player, DemolitionistNumpadAction.Defuse);
         }
 
         public static bool TryFinalizeSuccessfulKeypad(int numpadSessionId)
         {
             if (_numpadSessionCancelled
-                || _action == TerroristNumpadAction.None
+                || _action == DemolitionistNumpadAction.None
                 || numpadSessionId != _openNumpadSessionId)
             {
                 return false;
@@ -141,10 +141,10 @@ internal static class TerroristNumpad
             var plantKey = _plantConsoleKey;
             var plantKind = _plantKind;
 
-            if (action == TerroristNumpadAction.Plant)
+            if (action == DemolitionistNumpadAction.Plant)
             {
-                var duration = OptionGroupSingleton<TerroristOptions>.Instance.SabotageDuration;
-                TerroristSabotageState.RpcPlantSabotage(
+                var duration = OptionGroupSingleton<DemolitionistOptions>.Instance.SabotageDuration;
+                DemolitionistSabotageState.RpcPlantSabotage(
                     local,
                     local.PlayerId,
                     plantPos.x,
@@ -153,9 +153,9 @@ internal static class TerroristNumpad
                     plantKey,
                     (byte)plantKind);
             }
-            else if (action == TerroristNumpadAction.Defuse)
+            else if (action == DemolitionistNumpadAction.Defuse)
             {
-                TerroristSabotageState.RpcDefuseSabotage(local, local.PlayerId);
+                DemolitionistSabotageState.RpcDefuseSabotage(local, local.PlayerId);
             }
             else
             {
@@ -208,12 +208,12 @@ internal static class TerroristNumpad
             return a.Pointer == b.Pointer;
         }
 
-        private static bool Open(PlayerControl player, TerroristNumpadAction action)
+        private static bool Open(PlayerControl player, DemolitionistNumpadAction action)
         {
             _numpadSessionCancelled = false;
 
-            TerroristUtilityConsoles.InvalidateKeypadPrefabCache();
-            if (!TerroristUtilityConsoles.TryGetO2KeypadPrefab(out var prefab) || !prefab)
+            DemolitionistUtilityConsoles.InvalidateKeypadPrefabCache();
+            if (!DemolitionistUtilityConsoles.TryGetO2KeypadPrefab(out var prefab) || !prefab)
             {
                 return false;
             }
@@ -228,9 +228,9 @@ internal static class TerroristNumpad
                 return false;
             }
 
-            var taskObject = new GameObject("TerroristKeypadTask");
+            var taskObject = new GameObject("DemolitionistKeypadTask");
             taskObject.transform.SetParent(player.transform);
-            _task = taskObject.AddComponent<TerroristKeypadNoOxyTask>();
+            _task = taskObject.AddComponent<DemolitionistKeypadNoOxyTask>();
             _task.Owner = player;
             _task.targetNumber = UnityEngine.Random.Range(0, 100000);
             _openNumpadSessionId++;
@@ -251,10 +251,10 @@ internal static class TerroristNumpad
 
         private static void CleanupTaskOnly()
         {
-            _action = TerroristNumpadAction.None;
+            _action = DemolitionistNumpadAction.None;
             _plantPosition = Vector2.zero;
             _plantConsoleKey = 0;
-            _plantKind = TerroristUtilityKind.None;
+            _plantKind = DemolitionistUtilityKind.None;
 
             var task = _task;
             _task = null;
@@ -309,7 +309,7 @@ internal static class TerroristNumpad
             }
             else
             {
-                log.LogError("Terrorist keypad: failed to patch KeypadGame.Enter.");
+                log.LogError("Demolitionist keypad: failed to patch KeypadGame.Enter.");
             }
 
             var beginPostfix = AccessTools.Method(typeof(Keypad), nameof(KeypadGameBeginPostfix));
@@ -327,7 +327,7 @@ internal static class TerroristNumpad
             }
             else
             {
-                log.LogError("Terrorist keypad: failed to patch KeypadGame.ClickNumber.");
+                log.LogError("Demolitionist keypad: failed to patch KeypadGame.ClickNumber.");
             }
 
             var clearEntryPrefix = AccessTools.Method(typeof(Keypad), nameof(KeypadClearEntryPrefix));
@@ -342,7 +342,7 @@ internal static class TerroristNumpad
         [HarmonyPrefix]
         private static bool NoOxyTaskInitializePrefix(NoOxyTask __instance)
         {
-            if (__instance is not TerroristKeypadNoOxyTask tk)
+            if (__instance is not DemolitionistKeypadNoOxyTask tk)
             {
                 return true;
             }
@@ -366,11 +366,11 @@ internal static class TerroristNumpad
         [HarmonyPatch(typeof(NoOxyTask), "FixedUpdate")]
         [HarmonyPrefix]
         private static bool NoOxyTaskFixedUpdatePrefix(NoOxyTask __instance) =>
-            __instance is not TerroristKeypadNoOxyTask;
+            __instance is not DemolitionistKeypadNoOxyTask;
 
         private static void KeypadGameBeginPostfix(KeypadGame __instance)
         {
-            if (!Controller.TryGetTerroristNumpadSession(__instance, out _))
+            if (!Controller.TryGetDemolitionistNumpadSession(__instance, out _))
             {
                 return;
             }
@@ -380,7 +380,7 @@ internal static class TerroristNumpad
 
         private static bool KeypadClickNumberPrefix(KeypadGame __instance, int i)
         {
-            if (!Controller.TryGetTerroristNumpadSession(__instance, out _))
+            if (!Controller.TryGetDemolitionistNumpadSession(__instance, out _))
             {
                 return true;
             }
@@ -412,7 +412,7 @@ internal static class TerroristNumpad
 
         private static bool KeypadClearEntryPrefix(KeypadGame __instance)
         {
-            if (!Controller.TryGetTerroristNumpadSession(__instance, out _))
+            if (!Controller.TryGetDemolitionistNumpadSession(__instance, out _))
             {
                 return true;
             }
@@ -432,17 +432,17 @@ internal static class TerroristNumpad
 
         private static bool KeypadGameEnterPrefix(KeypadGame __instance)
         {
-            if (!Controller.TryGetTerroristNumpadSession(__instance, out var terroristNumpadSabotage)
-                || terroristNumpadSabotage == null)
+            if (!Controller.TryGetDemolitionistNumpadSession(__instance, out var demolitionistNumpadSabotage)
+                || demolitionistNumpadSabotage == null)
             {
                 return true;
             }
 
             var entered = ReadEnteredCode(__instance);
-            var correct = terroristNumpadSabotage.targetNumber == entered;
+            var correct = demolitionistNumpadSabotage.targetNumber == entered;
             var sessionId = Controller.ActiveOpenNumpadSessionId;
             __instance.StartCoroutine(
-                AnimateTerroristKeypad(__instance, correct, sessionId).WrapToIl2Cpp());
+                AnimateDemolitionistKeypad(__instance, correct, sessionId).WrapToIl2Cpp());
             return false;
         }
 
@@ -465,7 +465,7 @@ internal static class TerroristNumpad
             }
         }
 
-        private static IEnumerator AnimateTerroristKeypad(KeypadGame game, bool correct, int numpadSessionId)
+        private static IEnumerator AnimateDemolitionistKeypad(KeypadGame game, bool correct, int numpadSessionId)
         {
             var tr = Traverse.Create(game);
             tr.Field<bool>("animating").Value = true;
@@ -516,7 +516,7 @@ internal static class TerroristNumpad
     /// Minimal <see cref="NoOxyTask"/> for <see cref="KeypadGame.Begin"/>.
     /// </summary>
     [RegisterInIl2Cpp]
-    public sealed class TerroristKeypadNoOxyTask(nint cppPtr) : NoOxyTask(cppPtr)
+    public sealed class DemolitionistKeypadNoOxyTask(nint cppPtr) : NoOxyTask(cppPtr)
     {
         public override int TaskStep => 0;
 

@@ -19,7 +19,7 @@ public enum DivaniRpcCalls : uint
     OpportunistWin = 214,
     RecruiterSetPendingTarget = 215,
     RecruitImpostorFollowUp = 216,
-    TerroristPlantSabotage = 217,
-    TerroristDefuseSabotage = 218,
-    TerroristSabotageExpired = 219,
+    DemolitionistPlantSabotage = 217,
+    DemolitionistDefuseSabotage = 218,
+    DemolitionistSabotageExpired = 219,
 }

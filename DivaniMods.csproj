@@ -133,8 +133,8 @@
     <EmbeddedResource Include="Resources\Icons\Shuffle.png" />
     <EmbeddedResource Include="Resources\Icons\Beartrap.png" />
     <EmbeddedResource Include="Resources\Icons\Bloody.png" />
-    <EmbeddedResource Include="Resources\Icons\Terrorist.png" />
-    <EmbeddedResource Include="Resources\TerroristSabotageButton.png" />
+    <EmbeddedResource Include="Resources\Icons\Demolitionist.png" />
+    <EmbeddedResource Include="Resources\DemolitionistSabotageButton.png" />
     <!-- Audio clips must be WAV - loaded via MiraAPI's LoadableAudioResourceAsset,
          matching how TouMiraRolesExtension ships its sounds. -->
     <EmbeddedResource Include="Resources\FragileBreak.wav" />
@@ -154,8 +154,8 @@
     <EmbeddedResource Include="Resources\Banners\DivaniModNewsLogo.png" />
     <EmbeddedResource Include="Resources\Banners\DivaniModsLogoNew.png" Condition="Exists('Resources\Banners\DivaniModsLogoNew.png')" />
     <EmbeddedResource Include="Resources\OpportunistIntro.wav" />
-    <EmbeddedResource Include="Resources\TerroristIntro.wav" />
-    <EmbeddedResource Include="Resources\TerroristExplosion.wav" />
+    <EmbeddedResource Include="Resources\DemolitionistIntro.wav" />
+    <EmbeddedResource Include="Resources\DemolitionistExplosion.wav" />
     <EmbeddedResource Include="Resources\Announcements\modNews-en_US.json" />
     <EmbeddedResource Include="Resources\RecruitMeetingCrewmate.png" />
     <EmbeddedResource Include="Resources\RecruitMeetingImpostor.png" />

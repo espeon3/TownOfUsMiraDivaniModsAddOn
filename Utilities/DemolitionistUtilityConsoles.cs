@@ -8,7 +8,7 @@ using Object = UnityEngine.Object;
 
 namespace DivaniMods.Utilities;
 
-public enum TerroristUtilityKind : byte
+public enum DemolitionistUtilityKind : byte
 {
     None = 0,
     Admin = 1,
@@ -20,7 +20,7 @@ public enum TerroristUtilityKind : byte
 /// <summary>
 /// Utility console detection aligned with <c>HackerSystem</c> (map-specific admin/cams/vitals/door log).
 /// </summary>
-public static class TerroristUtilityConsoles
+public static class DemolitionistUtilityConsoles
 {
     /// <summary>Loose scan radius; <see cref="IsInConsoleUseRange"/> still requires vanilla <c>couldUse</c>.</summary>
     private const float ConsoleSearchRadius = 2f;
@@ -31,45 +31,45 @@ public static class TerroristUtilityConsoles
     private static SystemConsole? _cachedDoorLogConsole;
     private static int _cachedConsoleFrame = -1;
 
-    public static string GetDisplayName(TerroristUtilityKind kind) =>
+    public static string GetDisplayName(DemolitionistUtilityKind kind) =>
         kind switch
         {
-            TerroristUtilityKind.Admin => "Admin Table",
-            TerroristUtilityKind.Cameras => "Security",
-            TerroristUtilityKind.Vitals => "Vitals",
-            TerroristUtilityKind.DoorLog => "Door Log",
+            DemolitionistUtilityKind.Admin => "Admin Table",
+            DemolitionistUtilityKind.Cameras => "Security",
+            DemolitionistUtilityKind.Vitals => "Vitals",
+            DemolitionistUtilityKind.DoorLog => "Door Log",
             _ => "Unknown",
         };
 
     public static bool TryGetClosest(
         PlayerControl player,
         out Vector2 position,
-        out TerroristUtilityKind kind,
-        bool forTerroristPlant = false)
+        out DemolitionistUtilityKind kind,
+        bool forDemolitionistPlant = false)
     {
         position = Vector2.zero;
-        kind = TerroristUtilityKind.None;
+        kind = DemolitionistUtilityKind.None;
 
         if (player == null || player.Data == null || !ShipStatus.Instance)
         {
             return false;
         }
 
-        if (TryGetFromVanillaUseButton(player, forTerroristPlant, out position, out kind))
+        if (TryGetFromVanillaUseButton(player, forDemolitionistPlant, out position, out kind))
         {
             return true;
         }
 
         var playerPos = player.GetTruePosition();
         var range = ConsoleSearchRadius;
-        TerroristUtilityKind bestKind = TerroristUtilityKind.None;
+        DemolitionistUtilityKind bestKind = DemolitionistUtilityKind.None;
         var bestDistance = float.MaxValue;
         var bestPosition = Vector2.zero;
 
-        void ConsiderMap(TerroristUtilityKind candidateKind, MapConsole? candidateConsole)
+        void ConsiderMap(DemolitionistUtilityKind candidateKind, MapConsole? candidateConsole)
         {
             if (candidateConsole == null
-                || !IsInConsoleUseRange(candidateConsole, player, candidateKind, forTerroristPlant))
+                || !IsInConsoleUseRange(candidateConsole, player, candidateKind, forDemolitionistPlant))
             {
                 return;
             }
@@ -86,10 +86,10 @@ public static class TerroristUtilityConsoles
             bestPosition = candidatePos;
         }
 
-        void ConsiderSystem(TerroristUtilityKind candidateKind, SystemConsole? candidateConsole)
+        void ConsiderSystem(DemolitionistUtilityKind candidateKind, SystemConsole? candidateConsole)
         {
             if (candidateConsole == null
-                || !IsInConsoleUseRange(candidateConsole, player, candidateKind, forTerroristPlant))
+                || !IsInConsoleUseRange(candidateConsole, player, candidateKind, forDemolitionistPlant))
             {
                 return;
             }
@@ -108,25 +108,25 @@ public static class TerroristUtilityConsoles
 
         if (TryGetAdminConsole(playerPos, range, out var admin) && admin != null)
         {
-            ConsiderMap(TerroristUtilityKind.Admin, admin);
+            ConsiderMap(DemolitionistUtilityKind.Admin, admin);
         }
 
         if (TryGetCameraConsole(out var cam) && cam != null)
         {
-            ConsiderSystem(TerroristUtilityKind.Cameras, cam);
+            ConsiderSystem(DemolitionistUtilityKind.Cameras, cam);
         }
 
         if (TryGetVitalsConsole(out var vitals) && vitals != null)
         {
-            ConsiderSystem(TerroristUtilityKind.Vitals, vitals);
+            ConsiderSystem(DemolitionistUtilityKind.Vitals, vitals);
         }
 
         if (TryGetDoorLogConsole(out var doorLog) && doorLog != null)
         {
-            ConsiderSystem(TerroristUtilityKind.DoorLog, doorLog);
+            ConsiderSystem(DemolitionistUtilityKind.DoorLog, doorLog);
         }
 
-        if (bestKind == TerroristUtilityKind.None)
+        if (bestKind == DemolitionistUtilityKind.None)
         {
             return false;
         }
@@ -136,7 +136,7 @@ public static class TerroristUtilityConsoles
         return true;
     }
 
-    public static int GetStableId(TerroristUtilityKind kind, Vector2 position)
+    public static int GetStableId(DemolitionistUtilityKind kind, Vector2 position)
     {
         unchecked
         {
@@ -148,33 +148,33 @@ public static class TerroristUtilityConsoles
         }
     }
 
-    public static bool TryGetWorldPosition(TerroristUtilityKind kind, Vector2 fallbackPosition, out Vector3 worldPos)
+    public static bool TryGetWorldPosition(DemolitionistUtilityKind kind, Vector2 fallbackPosition, out Vector3 worldPos)
     {
         worldPos = Vector3.zero;
         switch (kind)
         {
-            case TerroristUtilityKind.Admin:
+            case DemolitionistUtilityKind.Admin:
                 if (TryGetAdminConsole(fallbackPosition, 2f, out var admin) && admin != null)
                 {
                     worldPos = admin.transform.position;
                     return true;
                 }
                 break;
-            case TerroristUtilityKind.Cameras:
+            case DemolitionistUtilityKind.Cameras:
                 if (TryGetCameraConsole(out var cam) && cam != null)
                 {
                     worldPos = cam.transform.position;
                     return true;
                 }
                 break;
-            case TerroristUtilityKind.Vitals:
+            case DemolitionistUtilityKind.Vitals:
                 if (TryGetVitalsConsole(out var vitals) && vitals != null)
                 {
                     worldPos = vitals.transform.position;
                     return true;
                 }
                 break;
-            case TerroristUtilityKind.DoorLog:
+            case DemolitionistUtilityKind.DoorLog:
                 if (TryGetDoorLogConsole(out var door) && door != null)
                 {
                     worldPos = door.transform.position;
@@ -184,44 +184,44 @@ public static class TerroristUtilityConsoles
         }
 
         worldPos = new Vector3(fallbackPosition.x, fallbackPosition.y, 0f);
-        return kind != TerroristUtilityKind.None;
+        return kind != DemolitionistUtilityKind.None;
     }
 
     public static bool IsAtPlantedUtility(
         PlayerControl player,
-        TerroristUtilityKind plantedKind,
+        DemolitionistUtilityKind plantedKind,
         Vector2 plantedPosition,
         int plantedConsoleKey)
     {
-        if (player == null || plantedKind == TerroristUtilityKind.None)
+        if (player == null || plantedKind == DemolitionistUtilityKind.None)
         {
             return false;
         }
 
         return plantedKind switch
         {
-            TerroristUtilityKind.Admin => TryGetAdminConsole(plantedPosition, ConsoleSearchRadius, out var admin)
+            DemolitionistUtilityKind.Admin => TryGetAdminConsole(plantedPosition, ConsoleSearchRadius, out var admin)
                 && admin != null
                 && MatchesPlantedConsole(plantedKind, plantedPosition, plantedConsoleKey, admin.transform.position)
-                && IsInConsoleUseRange(admin, player, TerroristUtilityKind.Admin, forTerroristPlant: true),
-            TerroristUtilityKind.Cameras => TryGetCameraConsole(out var cam)
+                && IsInConsoleUseRange(admin, player, DemolitionistUtilityKind.Admin, forDemolitionistPlant: true),
+            DemolitionistUtilityKind.Cameras => TryGetCameraConsole(out var cam)
                 && cam != null
                 && MatchesPlantedConsole(plantedKind, plantedPosition, plantedConsoleKey, cam.transform.position)
-                && IsInConsoleUseRange(cam, player, TerroristUtilityKind.Cameras, forTerroristPlant: true),
-            TerroristUtilityKind.Vitals => TryGetVitalsConsole(out var vitals)
+                && IsInConsoleUseRange(cam, player, DemolitionistUtilityKind.Cameras, forDemolitionistPlant: true),
+            DemolitionistUtilityKind.Vitals => TryGetVitalsConsole(out var vitals)
                 && vitals != null
                 && MatchesPlantedConsole(plantedKind, plantedPosition, plantedConsoleKey, vitals.transform.position)
-                && IsInConsoleUseRange(vitals, player, TerroristUtilityKind.Vitals, forTerroristPlant: true),
-            TerroristUtilityKind.DoorLog => TryGetDoorLogConsole(out var door)
+                && IsInConsoleUseRange(vitals, player, DemolitionistUtilityKind.Vitals, forDemolitionistPlant: true),
+            DemolitionistUtilityKind.DoorLog => TryGetDoorLogConsole(out var door)
                 && door != null
                 && MatchesPlantedConsole(plantedKind, plantedPosition, plantedConsoleKey, door.transform.position)
-                && IsInConsoleUseRange(door, player, TerroristUtilityKind.DoorLog, forTerroristPlant: true),
+                && IsInConsoleUseRange(door, player, DemolitionistUtilityKind.DoorLog, forDemolitionistPlant: true),
             _ => false,
         };
     }
 
     private static bool MatchesPlantedConsole(
-        TerroristUtilityKind kind,
+        DemolitionistUtilityKind kind,
         Vector2 plantedPosition,
         int plantedConsoleKey,
         Vector3 consolePosition)
@@ -233,25 +233,25 @@ public static class TerroristUtilityConsoles
 
     /// <summary>
     /// Same range as the vanilla Use button (<see cref="MapConsole.CanUse"/> <c>couldUse</c>).
-    /// Terrorist plant may use distance-only on utilities disabled by a prior explosion.
+    /// Demolitionist plant may use distance-only on utilities disabled by a prior explosion.
     /// </summary>
     public static bool IsInConsoleUseRange(
         MapConsole console,
         PlayerControl player,
-        TerroristUtilityKind kind,
-        bool forTerroristPlant)
+        DemolitionistUtilityKind kind,
+        bool forDemolitionistPlant)
     {
-        return IsInConsoleUseRangeInternal(console, player, kind, forTerroristPlant);
+        return IsInConsoleUseRangeInternal(console, player, kind, forDemolitionistPlant);
     }
 
-    /// <inheritdoc cref="IsInConsoleUseRange(MapConsole, PlayerControl, TerroristUtilityKind, bool)"/>
+    /// <inheritdoc cref="IsInConsoleUseRange(MapConsole, PlayerControl, DemolitionistUtilityKind, bool)"/>
     public static bool IsInConsoleUseRange(
         SystemConsole console,
         PlayerControl player,
-        TerroristUtilityKind kind,
-        bool forTerroristPlant)
+        DemolitionistUtilityKind kind,
+        bool forDemolitionistPlant)
     {
-        return IsInConsoleUseRangeInternal(console, player, kind, forTerroristPlant);
+        return IsInConsoleUseRangeInternal(console, player, kind, forDemolitionistPlant);
     }
 
     /// <summary>
@@ -259,12 +259,12 @@ public static class TerroristUtilityConsoles
     /// </summary>
     private static bool TryGetFromVanillaUseButton(
         PlayerControl player,
-        bool forTerroristPlant,
+        bool forDemolitionistPlant,
         out Vector2 position,
-        out TerroristUtilityKind kind)
+        out DemolitionistUtilityKind kind)
     {
         position = Vector2.zero;
-        kind = TerroristUtilityKind.None;
+        kind = DemolitionistUtilityKind.None;
 
         var hud = HudManager.Instance;
         if (hud?.UseButton is not { isActiveAndEnabled: true })
@@ -281,9 +281,9 @@ public static class TerroristUtilityConsoles
         if (target.TryCast<MapConsole>() is MapConsole map
             && TryGetAdminConsole((Vector2)map.transform.position, 0.25f, out var admin)
             && admin == map
-            && IsInConsoleUseRange(map, player, TerroristUtilityKind.Admin, forTerroristPlant))
+            && IsInConsoleUseRange(map, player, DemolitionistUtilityKind.Admin, forDemolitionistPlant))
         {
-            kind = TerroristUtilityKind.Admin;
+            kind = DemolitionistUtilityKind.Admin;
             position = map.transform.position;
             return true;
         }
@@ -294,25 +294,25 @@ public static class TerroristUtilityConsoles
         }
 
         if (TryGetCameraConsole(out var cam) && cam == sys
-            && IsInConsoleUseRange(sys, player, TerroristUtilityKind.Cameras, forTerroristPlant))
+            && IsInConsoleUseRange(sys, player, DemolitionistUtilityKind.Cameras, forDemolitionistPlant))
         {
-            kind = TerroristUtilityKind.Cameras;
+            kind = DemolitionistUtilityKind.Cameras;
             position = sys.transform.position;
             return true;
         }
 
         if (TryGetVitalsConsole(out var vitals) && vitals == sys
-            && IsInConsoleUseRange(vitals, player, TerroristUtilityKind.Vitals, forTerroristPlant))
+            && IsInConsoleUseRange(vitals, player, DemolitionistUtilityKind.Vitals, forDemolitionistPlant))
         {
-            kind = TerroristUtilityKind.Vitals;
+            kind = DemolitionistUtilityKind.Vitals;
             position = sys.transform.position;
             return true;
         }
 
         if (TryGetDoorLogConsole(out var door) && door == sys
-            && IsInConsoleUseRange(door, player, TerroristUtilityKind.DoorLog, forTerroristPlant))
+            && IsInConsoleUseRange(door, player, DemolitionistUtilityKind.DoorLog, forDemolitionistPlant))
         {
-            kind = TerroristUtilityKind.DoorLog;
+            kind = DemolitionistUtilityKind.DoorLog;
             position = sys.transform.position;
             return true;
         }
@@ -323,10 +323,10 @@ public static class TerroristUtilityConsoles
     private static bool IsInConsoleUseRangeInternal(
         Component console,
         PlayerControl player,
-        TerroristUtilityKind kind,
-        bool forTerroristPlant)
+        DemolitionistUtilityKind kind,
+        bool forDemolitionistPlant)
     {
-        if (console == null || player?.Data == null || kind == TerroristUtilityKind.None)
+        if (console == null || player?.Data == null || kind == DemolitionistUtilityKind.None)
         {
             return false;
         }
@@ -348,13 +348,13 @@ public static class TerroristUtilityConsoles
             return true;
         }
 
-        if (!forTerroristPlant)
+        if (!forDemolitionistPlant)
         {
             return false;
         }
 
         var key = GetStableId(kind, consolePos);
-        if (!TerroristSabotageState.IsUtilityDisabled(key, kind))
+        if (!DemolitionistSabotageState.IsUtilityDisabled(key, kind))
         {
             return false;
         }
@@ -420,9 +420,9 @@ public static class TerroristUtilityConsoles
     public static float GetConsoleUseDistance(object console) =>
         console is Component component ? GetUsableDistance(component) : 1f;
 
-    public static bool TryClassifySystemConsole(SystemConsole sys, out TerroristUtilityKind kind)
+    public static bool TryClassifySystemConsole(SystemConsole sys, out DemolitionistUtilityKind kind)
     {
-        kind = TerroristUtilityKind.None;
+        kind = DemolitionistUtilityKind.None;
         if (sys == null)
         {
             return false;
@@ -430,19 +430,19 @@ public static class TerroristUtilityConsoles
 
         if (TryGetCameraConsole(out var cam) && cam == sys)
         {
-            kind = TerroristUtilityKind.Cameras;
+            kind = DemolitionistUtilityKind.Cameras;
             return true;
         }
 
         if (TryGetVitalsConsole(out var vitals) && vitals == sys)
         {
-            kind = TerroristUtilityKind.Vitals;
+            kind = DemolitionistUtilityKind.Vitals;
             return true;
         }
 
         if (TryGetDoorLogConsole(out var door) && door == sys)
         {
-            kind = TerroristUtilityKind.DoorLog;
+            kind = DemolitionistUtilityKind.DoorLog;
             return true;
         }
 

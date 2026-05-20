@@ -35,8 +35,8 @@ public class DivaniPlugin : BasePlugin, IMiraPlugin
     {
         Instance = this;
         Harmony.PatchAll();
-        TerroristPatches.Register(Log);
-        TerroristNumpad.Register(Harmony, Log);
+        DemolitionistPatches.Register(Log);
+        DemolitionistNumpad.Register(Harmony, Log);
         FragileTownOfUsButtonPatch.Initialize(Harmony);
         RuthlessEventHandler.Initialize(Harmony);
         DutchMemeSoundpackPatch.Register(Harmony);

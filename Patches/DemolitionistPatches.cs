@@ -13,10 +13,10 @@ using UnityEngine;
 namespace DivaniMods.Patches;
 
 /// <summary>
-/// Harmony glue for Terrorist: imp sabotage mutex, emergency meeting, sabotage map, consoles, button visibility.
+/// Harmony glue for Demolitionist: imp sabotage mutex, emergency meeting, sabotage map, consoles, button visibility.
 /// </summary>
 [HarmonyPatch]
-public static class TerroristPatches
+public static class DemolitionistPatches
 {
     public static void Register(ManualLogSource log) => SabotageMap.Register(log);
 
@@ -26,7 +26,7 @@ public static class TerroristPatches
     [HarmonyPostfix]
     public static void EmergencyMinigameBeginPostfix(EmergencyMinigame __instance)
     {
-        if (!TerroristSabotageState.IsActive)
+        if (!DemolitionistSabotageState.IsActive)
         {
             return;
         }
@@ -38,7 +38,7 @@ public static class TerroristPatches
     [HarmonyPostfix]
     public static void EmergencyMinigameUpdatePostfix(EmergencyMinigame __instance)
     {
-        if (!TerroristSabotageState.IsActive)
+        if (!DemolitionistSabotageState.IsActive)
         {
             return;
         }
@@ -54,7 +54,7 @@ public static class TerroristPatches
         ref bool canUse,
         ref bool couldUse)
     {
-        if (!TerroristSabotageState.IsActive || !IsEmergencyConsole(__instance) || pc?.Object == null)
+        if (!DemolitionistSabotageState.IsActive || !IsEmergencyConsole(__instance) || pc?.Object == null)
         {
             return;
         }
@@ -71,22 +71,22 @@ public static class TerroristPatches
     [HarmonyPatch(typeof(SabotageButton), nameof(SabotageButton.DoClick))]
     [HarmonyPrefix]
     [HarmonyPriority(Priority.First)]
-    public static bool SabotageButtonDoClickPrefix() => !TerroristSabotageState.IsActive;
+    public static bool SabotageButtonDoClickPrefix() => !DemolitionistSabotageState.IsActive;
 
     [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnGameEnd))]
     [HarmonyPostfix]
     public static void OnGameEndPostfix()
     {
-        TerroristSabotageState.ResetAll();
-        TerroristUtilityConsoles.InvalidateCache();
+        DemolitionistSabotageState.ResetAll();
+        DemolitionistUtilityConsoles.InvalidateCache();
     }
 
     [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.CoStartGame))]
     [HarmonyPostfix]
     public static void ResetOnGameStart()
     {
-        TerroristSabotageState.ResetAll();
-        TerroristUtilityConsoles.InvalidateCache();
+        DemolitionistSabotageState.ResetAll();
+        DemolitionistUtilityConsoles.InvalidateCache();
     }
 
     private static void ApplySabotageEmergencyDisabledUi(EmergencyMinigame minigame)
@@ -119,7 +119,7 @@ public static class TerroristPatches
     private static bool IsWithinEmergencyUseDistance(SystemConsole console, PlayerControl player)
     {
         var dist = Vector2.Distance(player.GetTruePosition(), (Vector2)console.transform.position);
-        return dist <= TerroristUtilityConsoles.GetUsableDistance(console);
+        return dist <= DemolitionistUtilityConsoles.GetUsableDistance(console);
     }
 
     #endregion
@@ -146,7 +146,7 @@ public static class TerroristPatches
             }
 
             var player = PlayerControl.LocalPlayer;
-            if (player == null || player.Data == null || player.Data.IsDead || !IsTerrorist(player))
+            if (player == null || player.Data == null || player.Data.IsDead || !IsDemolitionist(player))
             {
                 plant.Button.gameObject.SetActive(false);
                 return;
@@ -158,20 +158,20 @@ public static class TerroristPatches
                 return;
             }
 
-            if (TerroristSabotageState.IsActive || TerroristSabotageState.IsCriticalVanillaSabotageActive())
+            if (DemolitionistSabotageState.IsActive || DemolitionistSabotageState.IsCriticalVanillaSabotageActive())
             {
                 plant.Button.gameObject.SetActive(false);
                 return;
             }
 
-            var nearUtility = TerroristUtilityConsoles.TryGetClosest(player, out _, out _, forTerroristPlant: true);
+            var nearUtility = DemolitionistUtilityConsoles.TryGetClosest(player, out _, out _, forDemolitionistPlant: true);
             plant.Button.gameObject.SetActive(nearUtility);
             if (!nearUtility)
             {
                 return;
             }
 
-            TerroristPlantButton.SyncAfterSabotageEnded(startCooldown: false);
+            DemolitionistPlantButton.SyncAfterSabotageEnded(startCooldown: false);
         }
 
         private static void UpdateDefuseButton()
@@ -195,13 +195,13 @@ public static class TerroristPatches
                 return;
             }
 
-            if (!TerroristSabotageState.IsActive)
+            if (!DemolitionistSabotageState.IsActive)
             {
                 defuse.Button.gameObject.SetActive(false);
                 return;
             }
 
-            var nearPlanted = TerroristSabotageState.IsLocalPlayerAtPlantedConsole();
+            var nearPlanted = DemolitionistSabotageState.IsLocalPlayerAtPlantedConsole();
             defuse.Button.gameObject.SetActive(nearPlanted);
             if (!nearPlanted)
             {
@@ -218,18 +218,18 @@ public static class TerroristPatches
             }
         }
 
-        private static TerroristPlantButton? ResolvePlantButton()
+        private static DemolitionistPlantButton? ResolvePlantButton()
         {
-            if (TerroristPlantButton.Instance != null)
+            if (DemolitionistPlantButton.Instance != null)
             {
-                return TerroristPlantButton.Instance;
+                return DemolitionistPlantButton.Instance;
             }
 
             foreach (var button in CustomButtonManager.Buttons)
             {
-                if (button is TerroristPlantButton plant)
+                if (button is DemolitionistPlantButton plant)
                 {
-                    TerroristPlantButton.Instance = plant;
+                    DemolitionistPlantButton.Instance = plant;
                     return plant;
                 }
             }
@@ -237,18 +237,18 @@ public static class TerroristPatches
             return null;
         }
 
-        private static TerroristDefuseButton? ResolveDefuseButton()
+        private static DemolitionistDefuseButton? ResolveDefuseButton()
         {
-            if (TerroristDefuseButton.Instance != null)
+            if (DemolitionistDefuseButton.Instance != null)
             {
-                return TerroristDefuseButton.Instance;
+                return DemolitionistDefuseButton.Instance;
             }
 
             foreach (var button in CustomButtonManager.Buttons)
             {
-                if (button is TerroristDefuseButton defuse)
+                if (button is DemolitionistDefuseButton defuse)
                 {
-                    TerroristDefuseButton.Instance = defuse;
+                    DemolitionistDefuseButton.Instance = defuse;
                     return defuse;
                 }
             }
@@ -256,7 +256,7 @@ public static class TerroristPatches
             return null;
         }
 
-        private static bool IsTerrorist(PlayerControl player)
+        private static bool IsDemolitionist(PlayerControl player)
         {
             var role = player.Data?.Role;
             if (role == null)
@@ -264,12 +264,12 @@ public static class TerroristPatches
                 return false;
             }
 
-            if (role is TerroristRole)
+            if (role is DemolitionistRole)
             {
                 return true;
             }
 
-            return role.GetType().Name == nameof(TerroristRole);
+            return role.GetType().Name == nameof(DemolitionistRole);
         }
     }
 
@@ -295,8 +295,8 @@ public static class TerroristPatches
             }
 
             var pos = (Vector2)__instance.transform.position;
-            var key = TerroristUtilityConsoles.GetStableId(TerroristUtilityKind.Admin, pos);
-            return ApplyDisable(pc, key, TerroristUtilityKind.Admin, ref canUse, ref couldUse, ref __result);
+            var key = DemolitionistUtilityConsoles.GetStableId(DemolitionistUtilityKind.Admin, pos);
+            return ApplyDisable(pc, key, DemolitionistUtilityKind.Admin, ref canUse, ref couldUse, ref __result);
         }
 
         [HarmonyPatch(typeof(SystemConsole), nameof(SystemConsole.CanUse))]
@@ -313,30 +313,30 @@ public static class TerroristPatches
                 return true;
             }
 
-            if (!TerroristUtilityConsoles.TryClassifySystemConsole(__instance, out var kind))
+            if (!DemolitionistUtilityConsoles.TryClassifySystemConsole(__instance, out var kind))
             {
                 return true;
             }
 
             var pos = (Vector2)__instance.transform.position;
-            var key = TerroristUtilityConsoles.GetStableId(kind, pos);
+            var key = DemolitionistUtilityConsoles.GetStableId(kind, pos);
             return ApplyDisable(pc, key, kind, ref canUse, ref couldUse, ref __result);
         }
 
         private static bool ApplyDisable(
             NetworkedPlayerInfo pc,
             int consoleKey,
-            TerroristUtilityKind kind,
+            DemolitionistUtilityKind kind,
             ref bool canUse,
             ref bool couldUse,
             ref float __result)
         {
-            if (!OptionGroupSingleton<TerroristOptions>.Instance.DisableExplodedConsoles)
+            if (!OptionGroupSingleton<DemolitionistOptions>.Instance.DisableExplodedConsoles)
             {
                 return true;
             }
 
-            if (!TerroristSabotageState.IsUtilityDisabled(consoleKey, kind))
+            if (!DemolitionistSabotageState.IsUtilityDisabled(consoleKey, kind))
             {
                 return true;
             }
@@ -350,7 +350,7 @@ public static class TerroristPatches
 
     #endregion
 
-    #region Imp sabotage map (grey/disable while Terrorist sabo active)
+    #region Imp sabotage map (grey/disable while Demolitionist sabo active)
 
     /// <summary>
     /// Imp sabotage uses <see cref="MapBehaviour"/> + <see cref="InfectedOverlay"/>, not a SabotageMinigame type.
@@ -364,7 +364,7 @@ public static class TerroristPatches
 
         public static void Register(ManualLogSource log)
         {
-            log.LogInfo("Terrorist sabotage map: using MapBehaviour / InfectedOverlay patches.");
+            log.LogInfo("Demolitionist sabotage map: using MapBehaviour / InfectedOverlay patches.");
         }
 
         public static void HudManagerUpdatePostfix()
@@ -380,7 +380,7 @@ public static class TerroristPatches
                 return;
             }
 
-            ApplyState(map, TerroristSabotageState.IsActive);
+            ApplyState(map, DemolitionistSabotageState.IsActive);
         }
 
         public static void OnMapShown(MapBehaviour map, MapOptions options)
@@ -391,13 +391,13 @@ public static class TerroristPatches
                 return;
             }
 
-            ApplyState(map, TerroristSabotageState.IsActive);
+            ApplyState(map, DemolitionistSabotageState.IsActive);
         }
 
         public static void OnSabotageMapShown(MapBehaviour map)
         {
             _sabotageMapOpen = true;
-            ApplyState(map, TerroristSabotageState.IsActive);
+            ApplyState(map, DemolitionistSabotageState.IsActive);
         }
 
         public static void OnMapClosed()
@@ -406,7 +406,7 @@ public static class TerroristPatches
         }
 
         /// <summary>Harmony prefix: false blocks the sabotage click.</summary>
-        public static bool AllowMapRoomSabotage() => !TerroristSabotageState.IsActive;
+        public static bool AllowMapRoomSabotage() => !DemolitionistSabotageState.IsActive;
 
         private static void ApplyState(MapBehaviour map, bool blocked)
         {
@@ -447,7 +447,7 @@ public static class TerroristPatches
 
                 // Doors always usable + white.
                 SetSpriteState(room.door, RestoreTint, true);
-                // Room sabotage icon: grey + disabled when terrorist sabo active.
+                // Room sabotage icon: grey + disabled when demolitionist sabo active.
                 SetSpriteState(room.special, tint, interactive);
             }
         }
@@ -503,7 +503,7 @@ public static class TerroristPatches
     }
 
     [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.Show), typeof(MapOptions))]
-    internal static class TerroristMapBehaviourShowPatch
+    internal static class DemolitionistMapBehaviourShowPatch
     {
         [HarmonyPostfix]
         private static void Postfix(MapBehaviour __instance, MapOptions opts) =>
@@ -511,7 +511,7 @@ public static class TerroristPatches
     }
 
     [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.ShowSabotageMap))]
-    internal static class TerroristMapBehaviourShowSabotageMapPatch
+    internal static class DemolitionistMapBehaviourShowSabotageMapPatch
     {
         [HarmonyPostfix]
         private static void Postfix(MapBehaviour __instance) =>
@@ -519,7 +519,7 @@ public static class TerroristPatches
     }
 
     [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.Close))]
-    internal static class TerroristMapBehaviourClosePatch
+    internal static class DemolitionistMapBehaviourClosePatch
     {
         [HarmonyPostfix]
         private static void Postfix() => SabotageMap.OnMapClosed();
@@ -532,7 +532,7 @@ public static class TerroristPatches
     [HarmonyPatch(typeof(MapRoom), nameof(MapRoom.SabotageSeismic))]
     [HarmonyPatch(typeof(MapRoom), nameof(MapRoom.SabotageHeli))]
     [HarmonyPatch(typeof(MapRoom), nameof(MapRoom.SabotageMushroomMixup))]
-    internal static class TerroristMapRoomSabotageBlockPatch
+    internal static class DemolitionistMapRoomSabotageBlockPatch
     {
         [HarmonyPrefix]
         private static bool Prefix() => SabotageMap.AllowMapRoomSabotage();

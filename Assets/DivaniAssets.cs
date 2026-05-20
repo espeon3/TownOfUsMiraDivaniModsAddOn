@@ -35,9 +35,9 @@ public static class DivaniAssets
     public static LoadableAsset<Sprite> SentinelIcon { get; } = new LoadableResourceAsset($"{IconPath}.Sentinel.png", 200);
     public static LoadableAsset<Sprite> SentinelPlaceBeaconButton { get; } = new LoadableResourceAsset($"{IconPath}.Sentinel.png", 250f);
     /// Lower PPU (source PNG is small ~256px) so role icon reads at the same on-screen size as other 200-PPU icons.
-    public static LoadableAsset<Sprite> TerroristIcon { get; } = new LoadableResourceAsset($"{IconPath}.Terrorist.png", 200);
+    public static LoadableAsset<Sprite> DemolitionistIcon { get; } = new LoadableResourceAsset($"{IconPath}.Demolitionist.png", 200);
     /// Yellow/blue Plant/Defuse button. Low PPU so the small source sprite reads at full HUD button size.
-    public static LoadableAsset<Sprite> TerroristSabotageButton { get; } = new LoadableResourceAsset($"{ShortPath}.TerroristSabotageButton.png", 100f);
+    public static LoadableAsset<Sprite> DemolitionistSabotageButton { get; } = new LoadableResourceAsset($"{ShortPath}.DemolitionistSabotageButton.png", 100f);
 
     // Audio clips - loaded lazily by MiraAPI from embedded WAVs, same approach
     // TouMiraRolesExtension uses. Drop WAV files into Resources/ and embed them
@@ -55,8 +55,8 @@ public static class DivaniAssets
     public static LoadableAsset<AudioClip> FragGiveSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.FragGive.wav");
     public static LoadableAsset<AudioClip> BearTrapActivateSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.BearTrapActivate.wav");
     public static LoadableAsset<AudioClip> OpportunistIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.OpportunistIntro.wav");
-    public static LoadableAsset<AudioClip> TerroristIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.TerroristIntro.wav");
-    public static LoadableAsset<AudioClip> TerroristExplosionSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.TerroristExplosion.wav");
+    public static LoadableAsset<AudioClip> DemolitionistIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.DemolitionistIntro.wav");
+    public static LoadableAsset<AudioClip> DemolitionistExplosionSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.DemolitionistExplosion.wav");
 
     // Dutch Meme Soundpack door SFX - used by DutchMemeSoundpackPatch to replace
     // the vanilla door open/close audio clips when the matching lobby toggle is on.

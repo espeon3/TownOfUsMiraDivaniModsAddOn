@@ -13,28 +13,28 @@ using UnityEngine;
 namespace DivaniMods.Buttons.Neutral.NeutralEvil;
 
 /// <summary>
-/// Defuse at the planted utility while Terrorist sabotage is active (terrorist or crew).
+/// Defuse at the planted utility while Demolitionist sabotage is active (demolitionist or crew).
 /// </summary>
-public class TerroristDefuseButton : CustomActionButton
+public class DemolitionistDefuseButton : CustomActionButton
 {
     public override string Name => "Defuse";
     public override float Cooldown => 1f;
-    public override float EffectDuration => OptionGroupSingleton<TerroristOptions>.Instance.IsTimedSabotageStyle
-        ? OptionGroupSingleton<TerroristOptions>.Instance.DefuseTime.Value
+    public override float EffectDuration => OptionGroupSingleton<DemolitionistOptions>.Instance.IsTimedSabotageStyle
+        ? OptionGroupSingleton<DemolitionistOptions>.Instance.DefuseTime.Value
         : 0f;
     public override int MaxUses => 0;
-    public override LoadableAsset<Sprite> Sprite => DivaniAssets.TerroristSabotageButton;
+    public override LoadableAsset<Sprite> Sprite => DivaniAssets.DemolitionistSabotageButton;
     public override ButtonLocation Location { get; set; } = ButtonLocation.BottomLeft;
-    public override Color TextOutlineColor => TerroristRole.TerroristColor;
+    public override Color TextOutlineColor => DemolitionistRole.DemolitionistColor;
     public override BaseKeybind Keybind => Keybinds.TertiaryAction;
 
-    public static TerroristDefuseButton? Instance { get; set; }
+    public static DemolitionistDefuseButton? Instance { get; set; }
 
     private bool _isDefusing;
 
     public static bool IsLocalDefusing =>
         (Instance != null && Instance._isDefusing)
-        || TerroristNumpad.Controller.DefuseInProgress;
+        || DemolitionistNumpad.Controller.DefuseInProgress;
 
     public override bool Enabled(RoleBehaviour? role)
     {
@@ -47,10 +47,10 @@ public class TerroristDefuseButton : CustomActionButton
         var player = PlayerControl.LocalPlayer;
         if (player == null || player.Data == null || player.Data.IsDead) return false;
         if (MeetingHud.Instance || ExileController.Instance) return false;
-        if (!TerroristSabotageState.IsActive) return false;
-        if (TerroristNumpad.Controller.InProgress) return false;
+        if (!DemolitionistSabotageState.IsActive) return false;
+        if (DemolitionistNumpad.Controller.InProgress) return false;
         if (_isDefusing) return false;
-        if (!TerroristSabotageState.IsLocalPlayerAtPlantedConsole()) return false;
+        if (!DemolitionistSabotageState.IsLocalPlayerAtPlantedConsole()) return false;
 
         return base.CanUse();
     }
@@ -70,11 +70,11 @@ public class TerroristDefuseButton : CustomActionButton
     {
         var player = PlayerControl.LocalPlayer;
         if (player == null) return;
-        if (!TerroristSabotageState.IsActive) return;
-        if (!TerroristSabotageState.IsLocalPlayerAtPlantedConsole()) return;
+        if (!DemolitionistSabotageState.IsActive) return;
+        if (!DemolitionistSabotageState.IsLocalPlayerAtPlantedConsole()) return;
         if (_isDefusing) return;
 
-        if (!OptionGroupSingleton<TerroristOptions>.Instance.IsTimedSabotageStyle)
+        if (!OptionGroupSingleton<DemolitionistOptions>.Instance.IsTimedSabotageStyle)
         {
             Coroutines.Start(DefuseNumpadCoroutine(player));
             return;
@@ -87,7 +87,7 @@ public class TerroristDefuseButton : CustomActionButton
     {
         _isDefusing = true;
         var defuseTime = EffectDuration;
-        var colorHex = ColorUtility.ToHtmlStringRGB(TerroristRole.TerroristColor);
+        var colorHex = ColorUtility.ToHtmlStringRGB(DemolitionistRole.DemolitionistColor);
 
         EffectActive = true;
         Timer = defuseTime;
@@ -96,7 +96,7 @@ public class TerroristDefuseButton : CustomActionButton
             $"<b><color=#{colorHex}>Defusing...</color></b>",
             Color.white,
             new Vector3(0f, 1f, -20f),
-            spr: DivaniAssets.TerroristSabotageButton.LoadAsset());
+            spr: DivaniAssets.DemolitionistSabotageButton.LoadAsset());
 
         var elapsed = 0f;
         while (elapsed < defuseTime)
@@ -107,19 +107,19 @@ public class TerroristDefuseButton : CustomActionButton
                 yield break;
             }
 
-            if (!TerroristSabotageState.IsActive)
+            if (!DemolitionistSabotageState.IsActive)
             {
                 AbortDefuse();
                 yield break;
             }
 
-            if (!TerroristSabotageState.IsLocalPlayerAtPlantedConsole())
+            if (!DemolitionistSabotageState.IsLocalPlayerAtPlantedConsole())
             {
                 MiraAPI.Utilities.Helpers.CreateAndShowNotification(
                     $"<b><color=#{colorHex}>Defuse aborted — too far from sabotage!</color></b>",
                     Color.white,
                     new Vector3(0f, 1f, -20f),
-                    spr: DivaniAssets.TerroristSabotageButton.LoadAsset());
+                    spr: DivaniAssets.DemolitionistSabotageButton.LoadAsset());
                 AbortDefuse();
                 yield break;
             }
@@ -140,24 +140,24 @@ public class TerroristDefuseButton : CustomActionButton
             yield break;
         }
 
-        if (!TerroristSabotageState.IsActive)
+        if (!DemolitionistSabotageState.IsActive)
         {
             AbortDefuse();
             yield break;
         }
 
-        if (!TerroristSabotageState.IsLocalPlayerAtPlantedConsole())
+        if (!DemolitionistSabotageState.IsLocalPlayerAtPlantedConsole())
         {
             MiraAPI.Utilities.Helpers.CreateAndShowNotification(
                 $"<b><color=#{colorHex}>Defuse aborted — too far from sabotage!</color></b>",
                 Color.white,
                 new Vector3(0f, 1f, -20f),
-                spr: DivaniAssets.TerroristSabotageButton.LoadAsset());
+                spr: DivaniAssets.DemolitionistSabotageButton.LoadAsset());
             AbortDefuse();
             yield break;
         }
 
-        TerroristSabotageState.RpcDefuseSabotage(player, player.PlayerId);
+        DemolitionistSabotageState.RpcDefuseSabotage(player, player.PlayerId);
         EffectActive = false;
         Timer = Cooldown;
         _isDefusing = false;
@@ -168,17 +168,17 @@ public class TerroristDefuseButton : CustomActionButton
         _isDefusing = true;
         EffectActive = true;
 
-        if (!TerroristNumpad.Controller.OpenDefuse(player))
+        if (!DemolitionistNumpad.Controller.OpenDefuse(player))
         {
             AbortDefuse();
             yield break;
         }
 
         // Same as plant: IsLocalPlayerAtPlantedConsole uses CouldUse paths that fail while KeypadGame is open.
-        while (TerroristNumpad.Controller.InProgress)
+        while (DemolitionistNumpad.Controller.InProgress)
         {
             if (player == null || player.Data == null || player.Data.IsDead
-                || !TerroristSabotageState.IsActive)
+                || !DemolitionistSabotageState.IsActive)
             {
                 AbortDefuse();
                 yield break;
@@ -194,9 +194,9 @@ public class TerroristDefuseButton : CustomActionButton
 
     private void AbortDefuse()
     {
-        if (TerroristNumpad.Controller.InProgress)
+        if (DemolitionistNumpad.Controller.InProgress)
         {
-            TerroristNumpad.Controller.CancelActive();
+            DemolitionistNumpad.Controller.CancelActive();
         }
 
         EffectActive = false;
