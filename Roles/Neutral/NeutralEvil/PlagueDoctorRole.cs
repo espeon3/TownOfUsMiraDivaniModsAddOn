@@ -4,6 +4,7 @@ using System.Linq;
 using AmongUs.GameOptions;
 using Il2CppInterop.Runtime.Attributes;
 using MiraAPI.GameOptions;
+using MiraAPI.Modifiers;
 using MiraAPI.Patches.Stubs;
 using MiraAPI.Roles;
 using MiraAPI.Utilities;
@@ -11,6 +12,7 @@ using MiraAPI.Utilities.Assets;
 using Reactor.Utilities;
 using Reactor.Networking.Attributes;
 using DivaniMods.Assets;
+using DivaniMods.Modifiers.Neutral.NeutralEvil;
 using DivaniMods.Options;
 using DivaniMods.Patches;
 using TownOfUs;
@@ -29,25 +31,20 @@ namespace DivaniMods.Roles.Neutral.NeutralEvil;
 public sealed class PlagueDoctorRole(IntPtr cppPtr)
     : NeutralRole(cppPtr), ITownOfUsRole, IWikiDiscoverable, IDoomable, ICrewVariant
 {
-    // IDoomable: tells Doomsayer which "hint category" to surface when guessing
-    // the PD. Fearmonger matches Plaguebearer/Pestilence/Arsonist (disease / fear
-    // themed killers).
     public DoomableType DoomHintType => DoomableType.Fearmonger;
 
-    // ICrewVariant: tells Imitator which crew role is the closest equivalent of
-    // the PD for imitation purposes. MedicRole fits the doctor theme.
     public RoleBehaviour CrewVariant =>
         RoleManager.Instance.GetRole((RoleTypes)RoleId.Get<MedicRole>());
 
     public static readonly Color PlagueDoctorColor = new Color32(255, 192, 0, 255);
 
-    // Static data that persists across role changes (death)
-    public static Dictionary<byte, bool> InfectedPlayers { get; } = new();
     public static Dictionary<byte, float> InfectionProgress { get; } = new();
     public static Dictionary<byte, bool> DeadPlayers { get; } = new();
     public static PlayerControl? PlagueDoctorPlayer { get; internal set; }
-    public static TMPro.TMP_Text? StatusText { get; set; }
-    
+
+    private static readonly Dictionary<byte, float> LastAccrueFrame = new();
+    private static float _lastProgressSync;
+
     public static int NumInfectionsRemaining { get; set; }
     public static bool MeetingFlag { get; set; }
     public static float ImmunityTimer { get; set; }
@@ -67,23 +64,12 @@ public sealed class PlagueDoctorRole(IntPtr cppPtr)
 
     public bool HasImpostorVision => true;
 
-    private float _lastProgressUpdate;
-
     public CustomRoleConfiguration Configuration => new(this)
     {
-        // Note: TasksCountForProgress, CanGetKilled and other team-dependent
-        // defaults are already correct for neutrals via
-        // CustomRoleConfiguration(ICustomRole) - no need to set them.
         CanUseVent = OptionGroupSingleton<PlagueDoctorOptions>.Instance.CanVent,
         Icon = DivaniAssets.PlagueDoctorIcon,
         IntroSound = DivaniAssets.PlagueDoctorIntroSound,
         MaxRoleCount = 1,
-        // Required so that on death the PD's role is swapped to NeutralGhostRole
-        // (which remains in ModdedRoleTeams.Custom and whose WinConditionMet()
-        // delegates to GetRoleWhenAlive()). Without this the dead PD gets the
-        // default CrewmateGhost role, which is filtered out by
-        // NeutralRoleWinCondition.GetActiveRolesOfTeam(Custom) and the win
-        // never triggers even when CanWinWhileDead is enabled.
         GhostRole = (RoleTypes)RoleId.Get<NeutralGhostRole>(),
     };
 
@@ -93,8 +79,6 @@ public sealed class PlagueDoctorRole(IntPtr cppPtr)
     {
         RoleBehaviourStubs.Initialize(this, targetPlayer);
         
-        // Always set — if we only set when null, Amnesiac (or any successor) inheriting PD keeps the
-        // stale pointer to the previous (often dead) PD and infection / HUD never tracks the new holder.
         var previous = PlagueDoctorPlayer;
         PlagueDoctorPlayer = targetPlayer;
         if (previous == null || previous.PlayerId != targetPlayer.PlayerId)
@@ -132,22 +116,15 @@ public sealed class PlagueDoctorRole(IntPtr cppPtr)
 
     public static void ClearAndReload()
     {
-        InfectedPlayers.Clear();
         InfectionProgress.Clear();
+        LastAccrueFrame.Clear();
         DeadPlayers.Clear();
         PlagueDoctorPlayer = null;
         NumInfectionsRemaining = (int)OptionGroupSingleton<PlagueDoctorOptions>.Instance.MaxInfections;
         MeetingFlag = false;
         ImmunityTimer = 0f;
         InfectionWarningShown = false;
-
-        if (StatusText != null)
-        {
-            UnityEngine.Object.Destroy(StatusText.gameObject);
-            StatusText = null;
-        }
-
-        PlagueDoctorPatch.ResetInfectionSpreadThrottle();
+        _lastProgressSync = 0f;
     }
 
     public override void SpawnTaskHeader(PlayerControl playerControl)
@@ -163,179 +140,119 @@ public sealed class PlagueDoctorRole(IntPtr cppPtr)
         orCreateTask.name = "NeutralRoleText";
     }
 
-    // Note: FixedUpdateHandler logic is now in PlagueDoctorPatch.HudManagerUpdate
-
-    private static void UpdateImmunityTimer()
+    public static bool IsInfected(PlayerControl? player)
     {
-        if (ImmunityTimer > 0)
-        {
-            ImmunityTimer -= Time.fixedDeltaTime;
-            if (ImmunityTimer <= 0)
-            {
-                MeetingFlag = false;
-            }
-        }
+        return player != null && player.HasModifier<PlagueInfectedModifier>();
     }
 
-    private void UpdateInfectionSpread()
+    public static bool IsPlagueDoctor(PlayerControl? player)
     {
-        if (MeetingFlag || MeetingHud.Instance) return;
-        
-        var localPlayer = PlayerControl.LocalPlayer;
-        if (localPlayer == null) return;
-        if (!CanWinWhileDead && localPlayer.Data.IsDead) return;
+        if (player == null)
+        {
+            return false;
+        }
 
-        var infectDistance = OptionGroupSingleton<PlagueDoctorOptions>.Instance.InfectDistance;
+        foreach (var role in CustomRoleUtils.GetActiveRolesOfType<PlagueDoctorRole>())
+        {
+            if (role.Player != null && role.Player.PlayerId == player.PlayerId)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static void InfectPlayer(PlayerControl? target)
+    {
+        if (target == null || target.Data == null || target.Data.IsDead)
+        {
+            return;
+        }
+
+        if (target == PlagueDoctorPlayer || IsPlagueDoctor(target) || IsInfected(target))
+        {
+            return;
+        }
+
+        target.RpcAddModifier<PlagueInfectedModifier>();
+    }
+
+    public static void OnPlayerInfected(PlayerControl? player)
+    {
+        if (player == null)
+        {
+            return;
+        }
+
         var infectDuration = OptionGroupSingleton<PlagueDoctorOptions>.Instance.InfectDuration;
+        InfectionProgress[player.PlayerId] = infectDuration;
+    }
+
+    public static void OnPlayerCured(PlayerControl? player)
+    {
+        if (player == null)
+        {
+            return;
+        }
+
+        InfectionProgress[player.PlayerId] = 0f;
+        LastAccrueFrame.Remove(player.PlayerId);
+    }
+
+    public static void SpreadInfectionFrom(PlayerControl source)
+    {
+        if (source == null || source.Data == null || source.Data.IsDead)
+        {
+            return;
+        }
+
+        var opts = OptionGroupSingleton<PlagueDoctorOptions>.Instance;
+        var infectDistance = opts.InfectDistance;
+        var infectDuration = opts.InfectDuration;
 
         foreach (var target in PlayerControl.AllPlayerControls)
         {
             if (target == null || target == PlagueDoctorPlayer) continue;
             if (target.Data == null || target.Data.IsDead) continue;
+            if (IsPlagueDoctor(target)) continue;
             if (target.inVent) continue;
-            if (InfectedPlayers.ContainsKey(target.PlayerId)) continue;
+            if (IsInfected(target)) continue;
 
-            if (!InfectionProgress.ContainsKey(target.PlayerId))
+            var distance = Vector3.Distance(source.transform.position, target.transform.position);
+            if (distance > infectDistance) continue;
+
+            var blocked = PhysicsHelpers.AnythingBetween(
+                source.GetTruePosition(),
+                target.GetTruePosition(),
+                Constants.ShipAndObjectsMask,
+                false);
+            if (blocked) continue;
+
+            if (LastAccrueFrame.TryGetValue(target.PlayerId, out var stamp) &&
+                Mathf.Approximately(stamp, Time.fixedTime))
             {
-                InfectionProgress[target.PlayerId] = 0f;
+                continue;
             }
 
-            foreach (var infectedId in InfectedPlayers.Keys.ToList())
+            LastAccrueFrame[target.PlayerId] = Time.fixedTime;
+
+            var progress = InfectionProgress.GetValueOrDefault(target.PlayerId, 0f) + Time.fixedDeltaTime;
+            InfectionProgress[target.PlayerId] = progress;
+
+            if (Time.time - _lastProgressSync > 0.5f)
             {
-                var source = GetPlayerById(infectedId);
-                if (source == null || source.Data == null || source.Data.IsDead) continue;
-
-                var distance = Vector3.Distance(source.transform.position, target.transform.position);
-                var blocked = PhysicsHelpers.AnythingBetween(
-                    source.GetTruePosition(),
-                    target.GetTruePosition(),
-                    Constants.ShipAndObjectsMask,
-                    false);
-
-                if (distance <= infectDistance && !blocked)
-                {
-                    InfectionProgress[target.PlayerId] += Time.fixedDeltaTime;
-
-                    if (Time.time - _lastProgressUpdate > 0.5f)
-                    {
-                        RpcUpdateInfectionProgress(localPlayer, target.PlayerId, InfectionProgress[target.PlayerId]);
-                        _lastProgressUpdate = Time.time;
-                    }
-
-                    break;
-                }
+                RpcUpdateInfectionProgress(PlayerControl.LocalPlayer, target.PlayerId, progress);
+                _lastProgressSync = Time.time;
             }
 
-            if (InfectionProgress[target.PlayerId] >= infectDuration)
+            if (progress >= infectDuration)
             {
-                RpcSetInfected(localPlayer, target.PlayerId);
+                InfectPlayer(target);
             }
         }
     }
 
-    private static void UpdateStatusText()
-    {
-        if (MeetingHud.Instance)
-        {
-            if (StatusText != null)
-            {
-                StatusText.gameObject.SetActive(false);
-            }
-            return;
-        }
-
-        var localPlayer = PlayerControl.LocalPlayer;
-        if (localPlayer == null) return;
-
-        if (StatusText == null)
-        {
-            CreateStatusText();
-        }
-
-        if (StatusText == null) return;
-
-        StatusText.gameObject.SetActive(true);
-
-        var infectDuration = OptionGroupSingleton<PlagueDoctorOptions>.Instance.InfectDuration;
-        var text = $"<color=#FFC000>[Infection Progress]</color>\n";
-
-        foreach (var p in PlayerControl.AllPlayerControls)
-        {
-            if (p == null || p == PlagueDoctorPlayer) continue;
-            if (DeadPlayers.ContainsKey(p.PlayerId) && DeadPlayers[p.PlayerId]) continue;
-            if (p.Data == null || p.Data.IsDead) continue;
-
-            text += $"{p.Data.PlayerName}: ";
-
-            if (InfectedPlayers.ContainsKey(p.PlayerId))
-            {
-                text += "<color=#FF0000>INFECTED</color>";
-            }
-            else
-            {
-                var progress = InfectionProgress.GetValueOrDefault(p.PlayerId, 0f);
-                var percent = Mathf.Clamp01(progress / infectDuration);
-                var color = GetProgressColor(percent);
-                text += $"<color={ColorToHex(color)}>{(percent * 100f):F1}%</color>";
-            }
-
-            text += "\n";
-        }
-
-        StatusText.text = text;
-    }
-
-    private static void CreateStatusText()
-    {
-        if (HudManager.Instance?.roomTracker == null) return;
-
-        var gameObject = UnityEngine.Object.Instantiate(HudManager.Instance.roomTracker.gameObject);
-        gameObject.transform.SetParent(HudManager.Instance.transform);
-        gameObject.SetActive(true);
-
-        var roomTracker = gameObject.GetComponent<RoomTracker>();
-        if (roomTracker != null)
-        {
-            UnityEngine.Object.DestroyImmediate(roomTracker);
-        }
-
-        StatusText = gameObject.GetComponent<TMPro.TMP_Text>();
-
-        var aliveCount = PlayerControl.AllPlayerControls.ToArray()
-            .Count(x => x != null && x.Data != null && !x.Data.IsDead && x != PlagueDoctorPlayer);
-
-        gameObject.transform.localPosition = new Vector3(-2.7f, -0.1f - aliveCount * 0.07f, gameObject.transform.localPosition.z);
-        StatusText.transform.localScale = Vector3.one;
-        StatusText.fontSize = 1.5f;
-        StatusText.fontSizeMin = 1.5f;
-        StatusText.fontSizeMax = 1.5f;
-        StatusText.alignment = TMPro.TextAlignmentOptions.BottomLeft;
-    }
-
-    private static Color GetProgressColor(float percent)
-    {
-        if (percent < 0.5f)
-        {
-            return Color.Lerp(Color.green, Color.yellow, percent * 2f);
-        }
-        return Color.Lerp(Color.yellow, Color.red, (percent * 2f) - 1f);
-    }
-
-    private static string ColorToHex(Color color)
-    {
-        return $"#{ColorUtility.ToHtmlStringRGB(color)}";
-    }
-
-    // Instance method required by ITownOfUsRole so TownOfUs's NeutralRoleWinCondition
-    // picks the PD up just like Arsonist/Plaguebearer/etc. This is what makes
-    // CustomGameOver.Trigger<NeutralGameOver>(...) fire correctly on the host, which
-    // in turn syncs the win screen to every client via Mira's RpcEndGame.
-    //
-    // When the PD is dead, NeutralGhostRole.WinConditionMet() is what's actually
-    // stored on the player, but it delegates back here through
-    // Player.GetRoleWhenAlive(). That's why we use this.Player (the role's own
-    // reference) rather than the static PlagueDoctorPlayer - it stays valid on
-    // the original role instance even after the ghost-role swap.
     public bool WinConditionMet()
     {
         if (Player == null) return false;
@@ -346,10 +263,11 @@ public sealed class PlagueDoctorRole(IntPtr cppPtr)
     private static bool HasInfectedAllLivingPlayers(PlayerControl player)
     {
         var livingPlayers = PlayerControl.AllPlayerControls.ToArray()
-            .Where(p => p != null && p.Data != null && !p.HasDied() && p != player)
+            .Where(p => p != null && p.Data != null && !p.HasDied() && p != player &&
+                        p.Data.Role is not PlagueDoctorRole)
             .ToList();
 
-        return livingPlayers.Count > 0 && livingPlayers.All(p => InfectedPlayers.ContainsKey(p.PlayerId));
+        return livingPlayers.Count > 0 && livingPlayers.All(IsInfected);
     }
 
     public static void HandleMeetingStart()
@@ -361,13 +279,6 @@ public sealed class PlagueDoctorRole(IntPtr cppPtr)
     public static void OnMeetingEnd()
     {
         UpdateDeadPlayers();
-
-        if (StatusText != null)
-        {
-            UnityEngine.Object.Destroy(StatusText.gameObject);
-            StatusText = null;
-        }
-
     }
 
     private static void TryTurnIntoAmnesiacWhenCannotWin()
@@ -398,10 +309,9 @@ public sealed class PlagueDoctorRole(IntPtr cppPtr)
 
     private static bool HasLivingInfectedPlayer()
     {
-        foreach (var infectedId in InfectedPlayers.Keys.ToList())
+        foreach (var p in PlayerControl.AllPlayerControls)
         {
-            var infected = GetPlayerById(infectedId);
-            if (infected != null && !infected.HasDied())
+            if (p != null && !p.HasDied() && IsInfected(p))
             {
                 return true;
             }
@@ -429,12 +339,6 @@ public sealed class PlagueDoctorRole(IntPtr cppPtr)
 
     public static void UpdateDeadPlayers()
     {
-        if (StatusText != null)
-        {
-            UnityEngine.Object.Destroy(StatusText.gameObject);
-            StatusText = null;
-        }
-        
         foreach (var pc in PlayerControl.AllPlayerControls)
         {
             if (pc?.Data != null)
@@ -456,7 +360,7 @@ public sealed class PlagueDoctorRole(IntPtr cppPtr)
         
         if (infectKiller)
         {
-            RpcSetInfected(localPlayer, killer.PlayerId);
+            InfectPlayer(killer);
         }
     }
 
@@ -470,17 +374,6 @@ public sealed class PlagueDoctorRole(IntPtr cppPtr)
             }
         }
         return null;
-    }
-
-    [MethodRpc((uint)DivaniRpcCalls.PlagueDoctorSetInfected)]
-    public static void RpcSetInfected(PlayerControl sender, byte targetId)
-    {
-        if (!InfectedPlayers.ContainsKey(targetId))
-        {
-            InfectedPlayers[targetId] = true;
-        }
-
-        TryShowInfectionWarning();
     }
 
     [MethodRpc((uint)DivaniRpcCalls.PlagueDoctorUpdateProgress)]
@@ -526,20 +419,27 @@ public sealed class PlagueDoctorRole(IntPtr cppPtr)
         return WinConditionMet() && PlagueDoctorPlayer != null && Player == PlagueDoctorPlayer;
     }
 
-    private static void TryShowInfectionWarning()
+    public static void TryShowInfectionWarning()
     {
         var options = OptionGroupSingleton<PlagueDoctorOptions>.Instance;
-        if (!options.NotifyPlayersWhenInfectionClose || InfectionWarningShown) return;
+        if (!options.NotifyPlayersWhenInfectionClose) return;
         if (PlagueDoctorPlayer == null) return;
 
         var uninfectedLeft = PlayerControl.AllPlayerControls.ToArray()
             .Count(p => p != null &&
                         p.Data != null &&
                         !p.HasDied() &&
-                        p != PlagueDoctorPlayer &&
-                        !InfectedPlayers.ContainsKey(p.PlayerId));
+                        !IsPlagueDoctor(p) &&
+                        !IsInfected(p));
 
-        if (uninfectedLeft <= 0 || uninfectedLeft > options.NotifyWhenUninfectedLeft.Value) return;
+        if (uninfectedLeft <= 0 || uninfectedLeft > options.NotifyWhenUninfectedLeft.Value)
+        {
+
+            InfectionWarningShown = false;
+            return;
+        }
+
+        if (InfectionWarningShown) return;
 
         InfectionWarningShown = true;
         MiraAPI.Utilities.Helpers.CreateAndShowNotification(

@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using MiraAPI.Modifiers;
 using DivaniMods.Modifiers.Crewmate;
+using DivaniMods.Modifiers.Neutral.NeutralEvil;
 
 namespace DivaniMods.Utilities;
 
 public static class DivaniNegativeEffects
 {
-    private static readonly List<Action<PlayerControl, ModifierComponent>> Removers =
+    private static readonly List<Action<PlayerControl>> Removers =
     [
         Remover<BloodyKillerFootstepsModifier>(),
+        Remover<PlagueInfectedModifier>(),
     ];
 
     public static void CleanseAll(PlayerControl player)
@@ -20,26 +21,20 @@ public static class DivaniNegativeEffects
             return;
         }
 
-        var comp = player.GetModifierComponent();
-        if (comp == null)
-        {
-            return;
-        }
-
         foreach (var remove in Removers)
         {
-            remove(player, comp);
+            remove(player);
         }
     }
 
-    private static Action<PlayerControl, ModifierComponent> Remover<T>()
+    private static Action<PlayerControl> Remover<T>()
         where T : BaseModifier
     {
-        return (player, comp) =>
+        return player =>
         {
-            foreach (var modifier in player.GetModifiers<T>().ToArray())
+            if (player.HasModifier<T>())
             {
-                comp.RemoveModifier(modifier);
+                player.RpcRemoveModifier<T>();
             }
         };
     }

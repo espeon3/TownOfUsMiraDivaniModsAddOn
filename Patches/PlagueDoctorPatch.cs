@@ -15,8 +15,6 @@ namespace DivaniMods.Patches;
 [HarmonyPatch]
 public static class PlagueDoctorPatch
 {
-    private static float _lastProgressUpdate;
-
     [RegisterEvent]
     public static void OnMeetingStart(StartMeetingEvent evt)
     {
@@ -57,11 +55,6 @@ public static class PlagueDoctorPatch
         PlagueDoctorRole.ClearAndReload();
     }
 
-    internal static void ResetInfectionSpreadThrottle()
-    {
-        _lastProgressUpdate = 0f;
-    }
-
     [RegisterEvent]
     public static void OnAfterMurder(AfterMurderEvent evt)
     {
@@ -85,7 +78,7 @@ public static class PlagueDoctorPatch
 
         if (infectKiller)
         {
-            PlagueDoctorRole.RpcSetInfected(localPlayer, killer.PlayerId);
+            PlagueDoctorRole.InfectPlayer(killer);
         }
     }
 
@@ -94,10 +87,8 @@ public static class PlagueDoctorPatch
     public static void ResetOnGameStart()
     {
         PlagueDoctorRole.ClearAndReload();
-        _lastProgressUpdate = 0f;
     }
 
-    // Main update loop - runs infection spread and win check
     [HarmonyPatch(typeof(HudManager), nameof(HudManager.Update))]
     [HarmonyPostfix]
     public static void HudManagerUpdate(HudManager __instance)
@@ -111,9 +102,6 @@ public static class PlagueDoctorPatch
 
         if (PlagueDoctorRole.PlagueDoctorPlayer == null) return;
 
-        // Tick immunity timer every frame while gameplay is active. Don't tick
-        // during meetings or the ejection sequence, or the grace period would
-        // silently drain before players can actually move.
         bool gameplayActive = !MeetingHud.Instance
                               && !ExileController.Instance
                               && !PlagueDoctorRole.MeetingFlag;
@@ -121,87 +109,16 @@ public static class PlagueDoctorPatch
         {
             PlagueDoctorRole.TickImmunityTimer(Time.deltaTime);
         }
-        
-        bool canWinDead = PlagueDoctorRole.CanWinWhileDead;
-        bool pdIsDead = PlagueDoctorRole.PlagueDoctorPlayer?.Data?.IsDead ?? false;
+
         bool localIsDead = localPlayer.Data?.IsDead ?? false;
-        
-        if (isLocalPD)
-        {
-            if (!pdIsDead || canWinDead)
-            {
-                RunInfectionSpread();
-            }
 
-            UpdateStatusText();
-        }
-        else if (localIsDead)
+        if (isLocalPD || localIsDead)
         {
             UpdateStatusText();
         }
 
-        // The actual win condition is evaluated on the host by TownOfUs's
-        // NeutralRoleWinCondition (registered in WinConditionRegistry), which
-        // calls PlagueDoctorRole.WinConditionMet() and then fires
-        // CustomGameOver.Trigger<NeutralGameOver>(...) - Mira then broadcasts
-        // the end game to every client so they all see the right win screen.
-    }
+        PlagueDoctorRole.TryShowInfectionWarning();
 
-    private static void RunInfectionSpread()
-    {
-        if (PlagueDoctorRole.MeetingFlag || MeetingHud.Instance) return;
-        // Respect the post-meeting immunity grace period.
-        if (PlagueDoctorRole.ImmunityTimer > 0f) return;
-        
-        var localPlayer = PlayerControl.LocalPlayer;
-        if (localPlayer == null) return;
-
-        var infectDistance = OptionGroupSingleton<PlagueDoctorOptions>.Instance.InfectDistance;
-        var infectDuration = OptionGroupSingleton<PlagueDoctorOptions>.Instance.InfectDuration;
-
-        foreach (var target in PlayerControl.AllPlayerControls)
-        {
-            if (target == null || target == PlagueDoctorRole.PlagueDoctorPlayer) continue;
-            if (target.Data == null || target.Data.IsDead) continue;
-            if (target.inVent) continue;
-            if (PlagueDoctorRole.InfectedPlayers.ContainsKey(target.PlayerId)) continue;
-
-            if (!PlagueDoctorRole.InfectionProgress.ContainsKey(target.PlayerId))
-            {
-                PlagueDoctorRole.InfectionProgress[target.PlayerId] = 0f;
-            }
-
-            foreach (var infectedId in PlagueDoctorRole.InfectedPlayers.Keys.ToList())
-            {
-                var source = GetPlayerById(infectedId);
-                if (source == null || source.Data == null || source.Data.IsDead) continue;
-
-                var distance = Vector3.Distance(source.transform.position, target.transform.position);
-                var blocked = PhysicsHelpers.AnythingBetween(
-                    source.GetTruePosition(),
-                    target.GetTruePosition(),
-                    Constants.ShipAndObjectsMask,
-                    false);
-
-                if (distance <= infectDistance && !blocked)
-                {
-                    PlagueDoctorRole.InfectionProgress[target.PlayerId] += Time.deltaTime;
-
-                    if (Time.time - _lastProgressUpdate > 0.5f)
-                    {
-                        PlagueDoctorRole.RpcUpdateInfectionProgress(localPlayer, target.PlayerId, PlagueDoctorRole.InfectionProgress[target.PlayerId]);
-                        _lastProgressUpdate = Time.time;
-                    }
-
-                    break;
-                }
-            }
-
-            if (PlagueDoctorRole.InfectionProgress[target.PlayerId] >= infectDuration)
-            {
-                PlagueDoctorRole.RpcSetInfected(localPlayer, target.PlayerId);
-            }
-        }
     }
 
     private static void UpdateStatusText()
@@ -235,10 +152,11 @@ public static class PlagueDoctorPatch
             if (p == null || p == PlagueDoctorRole.PlagueDoctorPlayer) continue;
             if (PlagueDoctorRole.DeadPlayers.ContainsKey(p.PlayerId) && PlagueDoctorRole.DeadPlayers[p.PlayerId]) continue;
             if (p.Data == null || p.Data.IsDead) continue;
+            if (PlagueDoctorRole.IsPlagueDoctor(p)) continue;
 
             var entry = $"{TrimName(p.Data.PlayerName)}: ";
 
-            if (PlagueDoctorRole.InfectedPlayers.ContainsKey(p.PlayerId))
+            if (PlagueDoctorRole.IsInfected(p))
             {
                 entry += "<color=#FF0000>INFECTED</color>";
             }
@@ -264,7 +182,7 @@ public static class PlagueDoctorPatch
             var rightIndex = i + splitIndex;
             if (rightIndex < entries.Count)
             {
-                text += $"<pos=80%>{entries[rightIndex]}";
+                text += $"<pos=90%>{entries[rightIndex]}";
             }
             text += "\n";
         }
@@ -275,17 +193,5 @@ public static class PlagueDoctorPatch
     private static string TrimName(string playerName)
     {
         return playerName;
-    }
-
-    private static PlayerControl? GetPlayerById(byte id)
-    {
-        foreach (var p in PlayerControl.AllPlayerControls)
-        {
-            if (p != null && p.PlayerId == id)
-            {
-                return p;
-            }
-        }
-        return null;
     }
 }

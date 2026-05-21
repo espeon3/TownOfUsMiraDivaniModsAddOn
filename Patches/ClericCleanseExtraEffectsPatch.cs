@@ -1,16 +1,17 @@
 using HarmonyLib;
 using DivaniMods.Utilities;
-using TownOfUs.Modifiers.Crewmate;
+using TownOfUs.Buttons.Crewmate;
 
 namespace DivaniMods.Patches;
+
 public static class ClericCleanseExtraEffectsPatch
 {
-    [HarmonyPatch(typeof(ClericCleanseModifier), "CleansePlayer")]
-    private static class CleansePlayerPatch
+    [HarmonyPatch(typeof(ClericCleanseButton), "OnClick")]
+    private static class OnClickPatch
     {
-        private static void Postfix(ClericCleanseModifier __instance)
+        private static void Postfix(ClericCleanseButton __instance)
         {
-            DivaniNegativeEffects.CleanseAll(__instance.Player);
+            DivaniNegativeEffects.CleanseAll(__instance.Target);
         }
     }
 }

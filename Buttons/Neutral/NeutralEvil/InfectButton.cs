@@ -37,8 +37,8 @@ public class InfectButton : TownOfUsTargetButton<PlayerControl>
         if (plagueDoctor == null) return null;
 
         var closest = localPlayer.GetClosestPlayer(true, Distance, true);
-        
-        if (closest != null && PlagueDoctorRole.InfectedPlayers.ContainsKey(closest.PlayerId))
+
+        if (closest != null && PlagueDoctorRole.IsInfected(closest))
         {
             return null;
         }
@@ -61,7 +61,12 @@ public class InfectButton : TownOfUsTargetButton<PlayerControl>
         var plagueDoctor = PlayerControl.LocalPlayer?.Data?.Role as PlagueDoctorRole;
         if (plagueDoctor == null) return false;
 
-        if (PlagueDoctorRole.InfectedPlayers.ContainsKey(target.PlayerId))
+        if (PlagueDoctorRole.IsPlagueDoctor(target))
+        {
+            return false;
+        }
+
+        if (PlagueDoctorRole.IsInfected(target))
         {
             return false;
         }
@@ -95,12 +100,12 @@ public class InfectButton : TownOfUsTargetButton<PlayerControl>
             return;
         }
 
-        if (PlagueDoctorRole.InfectedPlayers.ContainsKey(Target.PlayerId))
+        if (PlagueDoctorRole.IsInfected(Target))
         {
             return;
         }
 
-        PlagueDoctorRole.RpcSetInfected(player, Target.PlayerId);
+        PlagueDoctorRole.InfectPlayer(Target);
         PlagueDoctorRole.NumInfectionsRemaining--;
 
         PlayInfectSound();
