@@ -39,4 +39,13 @@ public sealed class UniversalModifierOptions : AbstractOptionGroup
         {
             Visible = () => OptionGroupSingleton<UniversalModifierOptions>.Instance.MisvoteAmount > 0
         };
+
+    [ModdedNumberOption("Memento Amount", 0, 5, 1)]
+    public float MementoAmount { get; set; } = 0;
+
+    public ModdedNumberOption MementoChance { get; } =
+        new("Memento Chance", 50f, 0, 100f, 10f, MiraNumberSuffixes.Percent)
+        {
+            Visible = () => OptionGroupSingleton<UniversalModifierOptions>.Instance.MementoAmount > 0
+        };
 }
