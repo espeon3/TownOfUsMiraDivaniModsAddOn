@@ -131,7 +131,7 @@ public static class DivaniModAnnouncementPatch
         AnnouncementPanel __instance,
         [HarmonyArgument(0)] Announcement announcement)
     {
-        if (announcement.Number < ModNewsNumberMin || announcement.Number >= ModNewsNumberMax)
+        if (announcement.Id != "DivaniMods")
         {
             return;
         }
