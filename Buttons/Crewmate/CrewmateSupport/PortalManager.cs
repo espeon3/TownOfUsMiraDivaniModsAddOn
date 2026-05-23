@@ -23,6 +23,8 @@ public static class PortalManager
     
     public static bool BothPortalsPlaced => Portal1Position.HasValue && Portal2Position.HasValue;
     public static int PortalsPlaced => (Portal1Position.HasValue ? 1 : 0) + (Portal2Position.HasValue ? 1 : 0);
+
+    public static bool PortalsUnlocked { get; set; }
     
     private static readonly Dictionary<byte, float> PlayerCooldowns = new();
     private static readonly HashSet<string> PortalUsers = new();
@@ -32,7 +34,8 @@ public static class PortalManager
     {
         Portal1Position = null;
         Portal2Position = null;
-        
+        PortalsUnlocked = false;
+
         if (Portal1Object != null)
         {
             UnityEngine.Object.Destroy(Portal1Object);

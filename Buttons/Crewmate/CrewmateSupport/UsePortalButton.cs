@@ -40,7 +40,10 @@ public class UsePortalButton : CustomActionButton
             return false;
         
         if (!PortalManager.BothPortalsPlaced) return false;
-        
+
+        if (OptionGroupSingleton<PortalmakerOptions>.Instance.EnableAfterFirstMeeting &&
+            !PortalManager.PortalsUnlocked) return false;
+
         var position = player.GetTruePosition();
         if (!PortalManager.IsNearPortal(position)) return false;
         

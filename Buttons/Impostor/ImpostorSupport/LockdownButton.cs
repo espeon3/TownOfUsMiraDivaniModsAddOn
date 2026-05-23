@@ -162,11 +162,6 @@ public class LockdownButton : TownOfUsButton
         if (Instance != null)
         {
             Instance.OverrideName("LOCKDOWN");
-            
-            if (Instance.Button != null)
-            {
-                Coroutines.Start(ShakeButton(Instance.Button));
-            }
         }
     }
 
@@ -197,26 +192,6 @@ public class LockdownButton : TownOfUsButton
         }
     }
     
-    private static IEnumerator ShakeButton(ActionButton button)
-    {
-        var originalPosition = button.transform.localPosition;
-        float elapsed = 0f;
-        float shakeDuration = 0.3f;
-        float shakeIntensity = 0.1f;
-        
-        while (elapsed < shakeDuration)
-        {
-            float x = UnityEngine.Random.Range(-shakeIntensity, shakeIntensity);
-            float y = UnityEngine.Random.Range(-shakeIntensity, shakeIntensity);
-            button.transform.localPosition = originalPosition + new Vector3(x, y, 0);
-            
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-        
-        button.transform.localPosition = originalPosition;
-    }
-
     private static void KickPlayersFromTasks()
     {
         var localPlayer = PlayerControl.LocalPlayer;

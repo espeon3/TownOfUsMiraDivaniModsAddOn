@@ -17,4 +17,7 @@ public class PortalmakerOptions : AbstractOptionGroup<PortalmakerRole>
 
     [ModdedNumberOption("Use Portal Cooldown", 5, 60, 5, MiraNumberSuffixes.Seconds)]
     public float UsePortalCooldown { get; set; } = 10;
+
+    [ModdedToggleOption("Enable Portals After First Meeting")]
+    public bool EnableAfterFirstMeeting { get; set; } = false;
 }

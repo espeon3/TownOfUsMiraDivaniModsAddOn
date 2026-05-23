@@ -74,13 +74,13 @@ public class PlacePortalButton : TownOfUsButton
             spr: DivaniAssets.PortalmakerIcon.LoadAsset());
         
         yield return new WaitForSeconds(EffectDuration);
-        
+
         if (player == null || player.Data == null || player.Data.IsDead)
         {
             _isPlacing = false;
             yield break;
         }
-        
+
         PortalManager.RpcPlacePortal(player, capturedPosition.x, capturedPosition.y);
 
         // Local-only SFX: RpcPlacePortal is the network broadcast, PlaySound
@@ -88,20 +88,18 @@ public class PlacePortalButton : TownOfUsButton
         PlayPlacePortalSound();
         
         int portalNum = PortalManager.PortalsPlaced;
-        string message = portalNum == 1 
+        var afterMeeting = OptionGroupSingleton<PortalmakerOptions>.Instance.EnableAfterFirstMeeting;
+        string message = portalNum == 1
             ? "<b><color=#6633CC>Portal 1 placed! Place another portal to complete the link.</color></b>"
-            : "<b><color=#6633CC>Portal 2 placed! Portals are now active!</color></b>";
+            : afterMeeting
+                ? "<b><color=#6633CC>Portal 2 placed! Portals will be enabled after the next meeting.</color></b>"
+                : "<b><color=#6633CC>Portal 2 placed! Portals are now active!</color></b>";
         
         MiraAPI.Utilities.Helpers.CreateAndShowNotification(
             message,
             Color.white,
             new Vector3(0f, 1f, -20f),
             spr: DivaniAssets.PortalmakerIcon.LoadAsset());
-        
-        if (Button != null)
-        {
-            Coroutines.Start(ShakeButton(Button));
-        }
         
         _isPlacing = false;
     }
@@ -121,23 +119,4 @@ public class PlacePortalButton : TownOfUsButton
         }
     }
 
-    private static IEnumerator ShakeButton(ActionButton button)
-    {
-        var originalPosition = button.transform.localPosition;
-        float elapsed = 0f;
-        float shakeDuration = 0.3f;
-        float shakeIntensity = 0.1f;
-        
-        while (elapsed < shakeDuration)
-        {
-            float x = UnityEngine.Random.Range(-shakeIntensity, shakeIntensity);
-            float y = UnityEngine.Random.Range(-shakeIntensity, shakeIntensity);
-            button.transform.localPosition = originalPosition + new Vector3(x, y, 0);
-            
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-        
-        button.transform.localPosition = originalPosition;
-    }
 }
