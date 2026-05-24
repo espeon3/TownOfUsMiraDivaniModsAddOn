@@ -95,7 +95,7 @@ Full role and modifier write-ups live on the **[project wiki](https://github.com
 
 Some of my roles and modifiers take design cues from other Among Us mod communities. These pages were useful references:
 
-- **Demolitionist** - [Conter Strike](https://www.counter-strike.net/) (Plant/Defuse bombs + the colorcodes)
+- **Demolitionist** - [Counter Strike](https://www.counter-strike.net/) (Plant/Defuse bombs + the colorcodes)
 - **Opportunist** — [TOHE: Collector](https://tohe.weareten.ca/options/Neutrals/Chaos/Collector.html) (vote-collection win pattern)
 - **Innocent** — [TOHE: Innocent](https://tohe.weareten.ca/options/Neutrals/Evil/Innocent.html)
 - **Plague Doctor** — [TheOtherRoles GMIA wiki — Neutral roles](https://github.com/GMIA-Nexus/TheOtherRolesGMIA/wiki/Neutral-Roles#plague-doctor)
