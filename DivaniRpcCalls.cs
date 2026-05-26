@@ -25,4 +25,7 @@ public enum DivaniRpcCalls : uint
     DomesmithPlaceDome = 220,
     DomesmithRemoveDome = 221,
     DomesmithBlockedKill = 222,
+    SummonerSetPendingTarget = 223,
+    SummonerRecruitRevenant = 224,
+    RevenantKill = 225,
 }

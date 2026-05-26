@@ -31,6 +31,7 @@ public sealed class SentinelRole(IntPtr cppPtr)
     public CustomRoleConfiguration Configuration => new(this)
     {
         Icon = DivaniAssets.SentinelIcon,
+        IntroSound = DivaniAssets.SentinelIntroSound,
         MaxRoleCount = 1,
     };
 }

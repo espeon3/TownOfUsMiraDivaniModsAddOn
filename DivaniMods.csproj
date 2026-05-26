@@ -135,6 +135,8 @@
     <EmbeddedResource Include="Resources\Icons\Bloody.png" />
     <EmbeddedResource Include="Resources\Icons\Demolitionist.png" />
     <EmbeddedResource Include="Resources\Icons\Domesmith.png" />
+    <EmbeddedResource Include="Resources\Icons\Summoner.png" />
+    <EmbeddedResource Include="Resources\Icons\Revenant.png" />
     <EmbeddedResource Include="Resources\DomesmithPlaceDome.png" />
     <EmbeddedResource Include="Resources\Icons\Memento.png" />
     <EmbeddedResource Include="Resources\DemolitionistPlant.png" />
@@ -165,7 +167,12 @@
     <EmbeddedResource Include="Resources\Announcements\modNews-en_US.json" />
     <EmbeddedResource Include="Resources\RecruitMeetingCrewmate.png" />
     <EmbeddedResource Include="Resources\RecruitMeetingImpostor.png" />
+    <EmbeddedResource Include="Resources\SummonerMeetingActive.png" />
+    <EmbeddedResource Include="Resources\SummonerMeetingInactive.png" />
     <EmbeddedResource Include="Resources\DomesmithIntro.wav" />
+    <EmbeddedResource Include="Resources\SummonerIntro.wav" />
+    <EmbeddedResource Include="Resources\SentinelIntro.wav" />
+    <EmbeddedResource Include="Resources\RecruiterIntro.wav" />
   </ItemGroup>
 
   <Target Name="CopyToPlugins" AfterTargets="Build">
