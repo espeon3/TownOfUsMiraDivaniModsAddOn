@@ -23,6 +23,9 @@ public sealed class ThiefRole(IntPtr cppPtr)
     public ModdedRoleTeams Team => ModdedRoleTeams.Crewmate;
     public RoleAlignment RoleAlignment => RoleAlignment.CrewmatePower;
 
+    // Pickpocket is not a comms-affected ability: no commsDown icon, usable during comms.
+    public override bool IsAffectedByComms => false;
+
     // Doomsayer hint category: stealing/manipulation fits Trickster (same as Mayor/Swapper).
     public DoomableType DoomHintType => DoomableType.Trickster;
 

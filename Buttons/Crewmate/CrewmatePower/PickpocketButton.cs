@@ -88,7 +88,7 @@ public class PickpocketButton : TownOfUsTargetButton<PlayerControl>
         var player = PlayerControl.LocalPlayer;
         if (player == null || player.Data == null || player.Data.IsDead) return false;
         if (player.Data.Role is not ThiefRole thief) return false;
-        
+
         var usesLeft = thief.MaxStolenModifiers - thief.StolenModifierIds.Count;
         SetUses(usesLeft);
         

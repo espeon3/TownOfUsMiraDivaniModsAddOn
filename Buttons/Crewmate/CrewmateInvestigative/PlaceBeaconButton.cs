@@ -34,6 +34,32 @@ public class PlaceBeaconButton : TownOfUsButton
         return role is SentinelRole;
     }
 
+    // Visible only for a live Sentinel standing in a valid room.
+    private static bool BeaconVisibleNow()
+    {
+        var player = PlayerControl.LocalPlayer;
+        if (player == null || player.Data == null || player.Data.IsDead) return false;
+        if (player.Data.Role is not SentinelRole) return false;
+        return BeaconManager.IsInRoom(player.GetTruePosition());
+    }
+
+    public override void SetActive(bool visible, RoleBehaviour role)
+    {
+        Button?.ToggleVisible(visible && Enabled(role) && BeaconVisibleNow());
+    }
+
+    protected override void FixedUpdate(PlayerControl playerControl)
+    {
+        if (MeetingHud.Instance)
+        {
+            return;
+        }
+
+        var hudActive = HudManager.Instance.UseButton.isActiveAndEnabled ||
+                        HudManager.Instance.PetButton.isActiveAndEnabled;
+        Button?.gameObject.SetActive(hudActive && BeaconVisibleNow());
+    }
+
     public override bool CanUse()
     {
         var player = PlayerControl.LocalPlayer;
