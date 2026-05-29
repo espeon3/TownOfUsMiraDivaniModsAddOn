@@ -71,6 +71,7 @@ desktop.ini
 terminals/
 agent-tools/
 agent-transcripts/
+graphify-out/
 .fake/
 *.log
 *.tmp
