@@ -60,8 +60,16 @@ public class DemolitionistDefuseButton : TownOfUsButton
             return;
         }
 
-        var hudActive = HudManager.Instance.UseButton.isActiveAndEnabled ||
-                        HudManager.Instance.PetButton.isActiveAndEnabled;
+        var hud = HudManager.Instance;
+        if (hud == null)
+        {
+            return;
+        }
+
+        var useButton = hud.UseButton;
+        var petButton = hud.PetButton;
+        var hudActive = (useButton != null && useButton.isActiveAndEnabled)
+            || (petButton != null && petButton.isActiveAndEnabled);
         Button?.gameObject.SetActive(hudActive && DefuseVisibleNow());
     }
 

@@ -292,7 +292,7 @@ public static class PortalManager
         
         SetPlayerCooldown(user.PlayerId);
         
-        if (user.AmOwner)
+        if (user.AmOwner && user.NetTransform != null)
         {
             user.NetTransform.RpcSnapTo(destination);
         }
