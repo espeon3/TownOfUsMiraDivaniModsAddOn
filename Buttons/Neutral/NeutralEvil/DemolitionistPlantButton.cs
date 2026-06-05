@@ -1,8 +1,6 @@
 using System.Collections;
-using System.Linq;
 using MiraAPI.GameOptions;
 using MiraAPI.Hud;
-using MiraAPI.Modifiers;
 using MiraAPI.Utilities.Assets;
 using Reactor.Utilities;
 using DivaniMods.Assets;
@@ -11,8 +9,6 @@ using DivaniMods.Patches;
 using DivaniMods.Roles.Neutral.NeutralEvil;
 using DivaniMods.Utilities;
 using TownOfUs.Buttons;
-using TownOfUs.Modifiers;
-using TownOfUs.Modifiers.Neutral;
 using UnityEngine;
 
 namespace DivaniMods.Buttons.Neutral.NeutralEvil;
@@ -64,8 +60,7 @@ public class DemolitionistPlantButton : TownOfUsButton
 
     public override void ClickHandler()
     {
-        if (!CanClick() || PlayerControl.LocalPlayer.HasModifier<GlitchHackedModifier>() ||
-            PlayerControl.LocalPlayer.GetModifiers<DisabledModifier>().Any(x => !x.CanUseAbilities))
+        if (!CanClick())
         {
             return;
         }

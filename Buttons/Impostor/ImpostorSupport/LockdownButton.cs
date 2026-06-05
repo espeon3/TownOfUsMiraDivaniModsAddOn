@@ -1,6 +1,5 @@
 using MiraAPI.GameOptions;
 using MiraAPI.Hud;
-using MiraAPI.Modifiers;
 using MiraAPI.Utilities.Assets;
 using Reactor.Networking.Attributes;
 using Reactor.Utilities;
@@ -8,10 +7,7 @@ using DivaniMods.Assets;
 using DivaniMods.Options;
 using DivaniMods.Roles.Impostor.ImpostorSupport;
 using System.Collections;
-using System.Linq;
 using TownOfUs.Buttons;
-using TownOfUs.Modifiers;
-using TownOfUs.Modifiers.Neutral;
 using UnityEngine;
 
 namespace DivaniMods.Buttons.Impostor.ImpostorSupport;
@@ -75,15 +71,14 @@ public class LockdownButton : TownOfUsButton
 
     public override void ClickHandler()
     {
-        if (!CanUse() || PlayerControl.LocalPlayer.HasModifier<GlitchHackedModifier>() ||
-            PlayerControl.LocalPlayer.GetModifiers<DisabledModifier>().Any(x => !x.CanUseAbilities))
+        if (!CanUse())
         {
             return;
         }
 
         OnClick();
         Button?.SetDisabled();
-
+        
         if (EffectActive)
         {
             Timer = Cooldown;
