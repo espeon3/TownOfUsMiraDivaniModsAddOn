@@ -56,3 +56,26 @@ public static class StrongVigilanteExemptPatch
         }
     }
 }
+[HarmonyPatch(typeof(AssassinModifier), "IsModifierValid")]
+public static class StrongAssassinModifierGuessPatch
+{
+    public static void Postfix(BaseModifier modifier, ref bool __result)
+    {
+        if (__result && modifier is StrongModifier)
+        {
+            __result = false;
+        }
+    }
+}
+
+[HarmonyPatch(typeof(VigilanteRole), "IsModifierValid")]
+public static class StrongVigilanteModifierGuessPatch
+{
+    public static void Postfix(BaseModifier modifier, ref bool __result)
+    {
+        if (__result && modifier is StrongModifier)
+        {
+            __result = false;
+        }
+    }
+}

@@ -20,7 +20,7 @@ public class IncompetentModifier : TouGameModifier, IColoredModifier, IWikiDisco
     public override ModifierFaction FactionType => ModifierFaction.CrewmatePassive;
     public override Color FreeplayFileColor => IncompetentColor;
     public Color ModifierColor => IncompetentColor;
-    public override LoadableAsset<Sprite>? ModifierIcon => DivaniAssets.SkilledIcon;
+    public override LoadableAsset<Sprite>? ModifierIcon => DivaniAssets.IncompetentIcon;
 
     public override string GetDescription() =>
         "You are unable to fix sabotages. Sabotage consoles won't light up or work for you.";

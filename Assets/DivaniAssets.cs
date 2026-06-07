@@ -57,6 +57,8 @@ public static class DivaniAssets
     public static LoadableAsset<Sprite> RuthlessIcon { get; } = new LoadableResourceAsset($"{IconPath}.Ruthless.png", 200);
     public static LoadableAsset<Sprite> SproutIcon { get; } = new LoadableResourceAsset($"{IconPath}.Sprout.png", 200);
     public static LoadableAsset<Sprite> ObfuscatorIcon { get; } = new LoadableResourceAsset($"{IconPath}.Obfuscator.png", 200);
+    public static LoadableAsset<Sprite> CunctatorIcon { get; } = new LoadableResourceAsset($"{IconPath}.Cunctator.png", 200);
+    public static LoadableAsset<Sprite> IncompetentIcon { get; } = new LoadableResourceAsset($"{IconPath}.Incompetent.png", 200);
     // Audio clips (16000hz)
     public static LoadableAsset<AudioClip> FragileBreak { get; } = new LoadableAudioResourceAsset($"{ShortPath}.FragileBreak.wav");
     public static LoadableAsset<AudioClip> PlagueDoctorIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.PlagueDoctorIntro.wav");
@@ -78,6 +80,7 @@ public static class DivaniAssets
     public static LoadableAsset<AudioClip> SentinelIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.SentinelIntro.wav");
     public static LoadableAsset<AudioClip> RecruiterIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.RecruiterIntro.wav");
     public static LoadableAsset<AudioClip> MosquitoIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.MosquitoIntro.wav");
+    public static LoadableAsset<AudioClip> CunctatorIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.CunctatorIntro.wav");
     public static LoadableAsset<AudioClip> MosquitoSwatSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.MosquitoSwat.wav");
     public static LoadableAsset<AudioClip> ObfuscatorIntro { get; } = new LoadableAudioResourceAsset($"{ShortPath}.ObfuscatorIntro.wav");
     // Dutch Meme Soundpack door SFX - used by DutchMemeSoundpackPatch to replace
@@ -101,9 +104,9 @@ public static class DivaniAssets
     public static LoadableAsset<Sprite> SummonerMeetingInactive { get; } =
         new LoadableResourceAsset($"{ShortPath}.SummonerMeetingInactive.png", 440f);
     public static LoadableAsset<Sprite> ObfuscateActive { get; } =
-        new LoadableResourceAsset($"{ShortPath}.ObfuscateActive.png", 330f);
+        new LoadableResourceAsset($"{ShortPath}.ObfuscateActive.png", 300f);
     public static LoadableAsset<Sprite> ObfuscateInactive { get; } =
-        new LoadableResourceAsset($"{ShortPath}.ObfuscateDisabled.png", 330f);
+        new LoadableResourceAsset($"{ShortPath}.ObfuscateDisabled.png", 300f);
 
     // Animation bundles
     public static readonly AssetBundle Bundle = AssetBundleManager.Load("divanimods-bundle");
