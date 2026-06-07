@@ -40,6 +40,7 @@ public class DivaniPlugin : BasePlugin, IMiraPlugin
         DemolitionistNumpad.Register(Harmony, Log);
         FragileTownOfUsButtonPatch.Initialize(Harmony);
         RuthlessEventHandler.Initialize(Harmony);
+        SniperSerialKillerKill.Initialize(Harmony);
         DutchMemeSoundpackPatch.Register(Harmony);
         VersionDisplay.Register();
         DivaniModAnnouncementPatch.EnsureLoaded();
