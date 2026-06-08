@@ -16,7 +16,7 @@ using TownOfUs.Roles.Crewmate;
 using TownOfUs.Utilities;
 using UnityEngine;
 
-namespace DivaniMods.Roles.Impostor.ImpostorSupport;
+namespace DivaniMods.Roles.Impostor.ImpostorPower;
 
 public sealed class RecruiterRole(IntPtr cppPtr)
     : ImpostorRole(cppPtr), ITownOfUsRole, IWikiDiscoverable, IDoomable, ICrewVariant
@@ -28,7 +28,7 @@ public sealed class RecruiterRole(IntPtr cppPtr)
         "In any meeting, recruit a non-Impostor to become an Impostor once.";
     public Color RoleColor => Palette.ImpostorRed;
     public ModdedRoleTeams Team => ModdedRoleTeams.Impostor;
-    public RoleAlignment RoleAlignment => RoleAlignment.ImpostorSupport;
+    public RoleAlignment RoleAlignment => RoleAlignment.ImpostorPower;
 
     public DoomableType DoomHintType => DoomableType.Insight;
 
