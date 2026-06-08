@@ -16,7 +16,7 @@ public class MosquitoOptions : AbstractOptionGroup<MosquitoRole>
     public override string GroupName => "Mosquito";
 
     public ModdedEnumOption TargetMode { get; } = new(
-        "Target Selection", (int)MosquitoTargetMode.Furthest, typeof(MosquitoTargetMode),
+        "Target Selection", (int)MosquitoTargetMode.PlayerSelection, typeof(MosquitoTargetMode),
         ["Furthest", "Selection Tablet"]);
 
     public ModdedNumberOption StingCooldown { get; } = new(
@@ -28,5 +28,5 @@ public class MosquitoOptions : AbstractOptionGroup<MosquitoRole>
     public ModdedNumberOption ChargesPerKill { get; } = new(
         "Charges Per Kill", 1f, 0f, 3f, 1f, MiraNumberSuffixes.None);
 
-    public ModdedToggleOption AimbotMode { get; } = new("Aimbot Mode", false);
+    public ModdedToggleOption AimbotMode { get; } = new("Aimbot Mode", true);
 }
