@@ -4,7 +4,7 @@ using AmongUs.GameOptions;
 using HarmonyLib;
 using MiraAPI.Roles;
 using MiraAPI.Utilities;
-using DivaniMods.Roles.Impostor.ImpostorSupport;
+using DivaniMods.Roles.Impostor.ImpostorPower;
 using TownOfUs.Roles;
 using TownOfUs.Utilities;
 
