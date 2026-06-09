@@ -27,34 +27,47 @@ public static class UseButtonOverridePatch
     private static bool _savedLabelActive;
     private static bool _savedLabelValid;
 
-    [HarmonyPatch(typeof(HudManager), nameof(HudManager.Update))]
+    // The use button and pet button share the bottom-right slot. When a pet is owned
+    // and nothing is usable, vanilla deactivates the use button and shows the pet
+    // button instead. We force the use button to keep the slot and disable the pet
+    // button's click component so it can never swallow the tap.
+    private static PassiveButton? _petPassive;
+    private static bool _petPassiveSaved;
+    private static bool _petPassiveWasEnabled;
+
+    // FixedUpdate runs before Unity polls mouse/collider input, so forcing the use
+    // button active here (on an always-active object) guarantees it owns the slot at
+    // click time. Postfixing only the Update-phase hooks was too late for the click.
+    [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
     [HarmonyPriority(Priority.Last)]
     [HarmonyPostfix]
-    public static void HudManagerUpdatePostfix(HudManager __instance)
+    public static void PlayerControlFixedUpdatePostfix(PlayerControl __instance)
     {
-        PortalManager.UpdatePortalOutlines();
-        DemolitionistSabotageState.UpdatePlantedConsoleOutline();
-
-        var useButton = __instance != null ? __instance.UseButton : null;
-        if (useButton == null)
+        if (__instance == null || !__instance.AmOwner)
         {
             return;
         }
 
-        ApplyOverride(useButton);
+        ApplyOverride();
+    }
+
+    [HarmonyPatch(typeof(HudManager), nameof(HudManager.Update))]
+    [HarmonyPriority(Priority.Last)]
+    [HarmonyPostfix]
+    public static void HudManagerUpdatePostfix()
+    {
+        PortalManager.UpdatePortalOutlines();
+        DemolitionistSabotageState.UpdatePlantedConsoleOutline();
+
+        ApplyOverride();
     }
 
     [HarmonyPatch(typeof(UseButton), nameof(UseButton.SetTarget))]
     [HarmonyPriority(Priority.Last)]
     [HarmonyPostfix]
-    public static void UseButtonSetTargetPostfix(UseButton __instance)
+    public static void UseButtonSetTargetPostfix()
     {
-        if (__instance == null)
-        {
-            return;
-        }
-
-        ApplyOverride(__instance);
+        ApplyOverride();
     }
 
     [HarmonyPatch(typeof(ConsoleJoystick), nameof(ConsoleJoystick.Update))]
@@ -62,14 +75,7 @@ public static class UseButtonOverridePatch
     [HarmonyPostfix]
     public static void ConsoleJoystickUpdatePostfix()
     {
-        var hud = HudManager.Instance;
-        var useButton = hud != null ? hud.UseButton : null;
-        if (useButton == null)
-        {
-            return;
-        }
-
-        ApplyOverride(useButton);
+        ApplyOverride();
     }
 
     [HarmonyPatch(typeof(ActionButton), nameof(ActionButton.SetDisabled))]
@@ -117,8 +123,20 @@ public static class UseButtonOverridePatch
         }
     }
 
-    private static void ApplyOverride(UseButton useButton)
+    private static void ApplyOverride()
     {
+        var hud = HudManager.Instance;
+        if (hud == null)
+        {
+            return;
+        }
+
+        var useButton = hud.UseButton;
+        if (useButton == null)
+        {
+            return;
+        }
+
         var kind = ComputeKind();
 
         if (kind == Kind.None)
@@ -133,6 +151,8 @@ public static class UseButtonOverridePatch
         }
 
         _active = kind;
+
+        DriveSlot(hud, useButton);
 
         var sprite = kind == Kind.Defuse
             ? DivaniAssets.DemolitionistDefuseButton.LoadAsset()
@@ -168,6 +188,54 @@ public static class UseButtonOverridePatch
             useButton.buttonLabelText.color = labelColor;
             useButton.buttonLabelText.SetOutlineColor(labelColor);
         }
+    }
+
+    private static void DriveSlot(HudManager hud, UseButton useButton)
+    {
+        if (!useButton.gameObject.activeSelf)
+        {
+            useButton.gameObject.SetActive(true);
+        }
+
+        var pet = hud.PetButton;
+        if (pet == null)
+        {
+            return;
+        }
+
+        var passive = pet.GetComponent<PassiveButton>();
+        if (passive != null)
+        {
+            if (!_petPassiveSaved)
+            {
+                _petPassive = passive;
+                _petPassiveWasEnabled = passive.enabled;
+                _petPassiveSaved = true;
+            }
+
+            passive.enabled = false;
+        }
+
+        if (pet.gameObject.activeSelf)
+        {
+            pet.gameObject.SetActive(false);
+        }
+    }
+
+    private static void RestorePet()
+    {
+        if (!_petPassiveSaved)
+        {
+            return;
+        }
+
+        if (_petPassive != null)
+        {
+            _petPassive.enabled = _petPassiveWasEnabled;
+        }
+
+        _petPassive = null;
+        _petPassiveSaved = false;
     }
 
     private static void ForceVisualEnabled(UseButton useButton)
@@ -224,6 +292,8 @@ public static class UseButtonOverridePatch
         }
 
         useButton.SetDisabled();
+
+        RestorePet();
 
         _savedSprite = null;
         _savedSpriteValid = false;
