@@ -391,6 +391,26 @@
         "\n- Innocent now has its own intro sound.",
         "\n- Incompetent color change."
       ]
+    },
+    {
+      "Date": "2026-06-09T12:00:00Z",
+      "Number": "10012",
+      "ShortTitle": "Divani Mods v1.2.6",
+      "Title": "Portalmaker Use button hotfix + new assets",
+      "SubTitle": "Use Portal works with pets, Mosquito reclassified, new button icons",
+      "Text": [
+        "\r<size=110%><b>Divani Mods v1.2.6</b></size>",
+        "\n\nHotfix for the Portalmaker Use Portal button plus new assets.",
+        "\n\n★ <link=https://github.com/DivaniNL/TownOfUsMiraDivaniModsAddOn/releases/tag/v1.2.6>Download v1.2.6</link>",
+        "\n\n★ <link=https://github.com/DivaniNL/TownOfUsMiraDivaniModsAddOn/wiki>Wiki</link>",
+        "\n\n\r<size=108%><b>Bug fixes</b></size>",
+        "\n\n- <b>Portalmaker</b> Use Portal button (which overrides the in-game Use button) now also works with pets enabled.",
+        "\n\n\r<size=108%><b>Role changes</b></size>",
+        "\n\n- <b>Mosquito</b> moved to the Impostor Killing faction.",
+        "\n\n\r<size=108%><b>Misc Changes</b></size>",
+        "\n\n- New button icons for Frag, Plague Doctor, and Shuffle (thanks Xinav <3).",
+        "\n- Renamed \"Bomb\" to \"Frag\" in Frag's options and button labels to match the timer and role name."
+      ]
     }
   ]
 }
