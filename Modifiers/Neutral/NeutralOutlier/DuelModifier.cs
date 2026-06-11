@@ -9,6 +9,7 @@ using Reactor.Utilities.Extensions;
 using DivaniMods.Buttons.Neutral.NeutralOutlier;
 using DivaniMods.Modules.Duelist;
 using DivaniMods.Options;
+using DivaniMods.Patches;
 using DivaniMods.Roles.Neutral.NeutralOutlier;
 using TownOfUs.Modifiers;
 using TownOfUs.Utilities;
@@ -17,16 +18,6 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace DivaniMods.Modifiers.Neutral.NeutralOutlier;
-
-// Hidden modifier carried by both duellists for the duration of a duel. It is networked
-// (added inside the start RPC on every client) so that each client can render the pair
-// differently for the local observer:
-//   - the duellist sees themselves and the target normally,
-//   - the target sees the duellist camouflaged (hidden identity),
-//   - everyone else sees neither of them (invisible),
-//   - and each participant has all non-participants hidden on their own screen.
-// It also extends DisabledModifier, so every other ability/button is disabled for the
-// duration of the duel (only the DuelFightButton bypasses that).
 public sealed class DuelModifier(byte opponentId, bool isDuelist, Vector2 returnPos)
     : DisabledModifier, IVisualAppearance
 {
@@ -36,6 +27,9 @@ public sealed class DuelModifier(byte opponentId, bool isDuelist, Vector2 return
     public override bool RemoveOnComplete => false;
     public override float Duration => 600f;
     public bool VisualPriority => true;
+    public override bool CanBeInteractedWith => false;
+    public override bool CanUseConsoles => true;
+    public override bool CanOpenMap => true;
 
     [HideFromIl2Cpp] public bool IsHiddenFromList => true;
 
@@ -50,28 +44,48 @@ public sealed class DuelModifier(byte opponentId, bool isDuelist, Vector2 return
 
     public VisualAppearance GetVisualAppearance()
     {
-        var app = new VisualAppearance(Player.GetDefaultAppearance(), TownOfUsAppearances.PlayerNameOnly);
-
-        // Both duellists get the duel speed boost.
-        app.Speed = Speed;
-
         var observer = PlayerControl.LocalPlayer;
-        if (observer == null || observer.PlayerId == Player.PlayerId)
-        {
-            return app; // see yourself normally
-        }
+        var isParticipant = observer != null &&
+            (observer.PlayerId == Player.PlayerId || observer.PlayerId == OpponentId);
 
-        if (observer.PlayerId == OpponentId)
+        if (!isParticipant)
         {
-            if (IsDuelist)
+            var invisible = new VisualAppearance(Player.GetDefaultAppearance(), TownOfUsAppearances.PlayerNameOnly)
             {
-                ApplyCamo(app); // duellist looks camouflaged to its target
-            }
-            return app;
+                Speed = Speed,
+            };
+            ApplyInvisible(invisible);
+            return invisible;
         }
 
-        ApplyInvisible(app); // invisible to everyone outside the duel
+        var shifted = GetShapeshiftAppearance();
+        if (shifted != null)
+        {
+            shifted.Speed = Speed;
+            return shifted;
+        }
+
+        var app = new VisualAppearance(Player.GetDefaultAppearance(), TownOfUsAppearances.PlayerNameOnly)
+        {
+            Speed = Speed,
+        };
+        if (observer!.PlayerId == OpponentId && IsDuelist)
+        {
+            ApplyCamo(app);
+        }
         return app;
+    }
+
+    private VisualAppearance? GetShapeshiftAppearance()
+    {
+        foreach (var mod in Player.GetModifiers<BaseModifier>())
+        {
+            if (mod != this && mod is IVisualAppearance { VisualPriority: true } visual)
+            {
+                return visual.GetVisualAppearance();
+            }
+        }
+        return null;
     }
 
     private static void ApplyCamo(VisualAppearance app)
@@ -102,7 +116,6 @@ public sealed class DuelModifier(byte opponentId, bool isDuelist, Vector2 return
     {
         base.OnActivate();
         Player.RawSetAppearance(this);
-
         if (Player.AmOwner)
         {
             _arrow = MiscUtils.CreateArrow(Player.transform, DuelistRole.DuelistColor);
@@ -113,6 +126,11 @@ public sealed class DuelModifier(byte opponentId, bool isDuelist, Vector2 return
     {
         base.FixedUpdate();
 
+        if (!Player.AmOwner && Player.Collider != null && Player.Collider.enabled)
+        {
+            Player.Collider.enabled = false;
+        }
+
         var opponent = MiscUtils.PlayerById(OpponentId);
         if (opponent == null || opponent.Data == null || opponent.Data.Disconnected)
         {
@@ -122,10 +140,26 @@ public sealed class DuelModifier(byte opponentId, bool isDuelist, Vector2 return
             }
             return;
         }
+        if (Player.TryGetModifier<IndirectAttackerModifier>(out var indirect))
+        {
+            indirect.ResetTimer();
+        }
+        else
+        {
+            Player.AddModifier<IndirectAttackerModifier>(true);
+        }
 
-        // Reassert appearance through a mushroom mix-up, same as the swooper does.
+        var observer = PlayerControl.LocalPlayer;
+        var isParticipant = observer != null &&
+            (observer.PlayerId == Player.PlayerId || observer.PlayerId == OpponentId);
+        if (!isParticipant)
+        {
+            SetAnimHoldersActive(false);
+        }
+
         var mushroom = Object.FindObjectOfType<MushroomMixupSabotageSystem>();
-        if (mushroom && mushroom.IsActive)
+        if ((mushroom && mushroom.IsActive) || GetShapeshiftAppearance() != null
+            || Player.GetAppearanceType() == TownOfUsAppearances.Default)
         {
             Player.RawSetAppearance(this);
         }
@@ -156,6 +190,26 @@ public sealed class DuelModifier(byte opponentId, bool isDuelist, Vector2 return
     {
         base.OnDeactivate();
 
+        SetAnimHoldersActive(true);
+        if (Player != null && Player.AmOwner)
+        {
+            TimeLordDuelGuardPatch.ClearLocalRewindHistory();
+
+            if (IsDuelist)
+            {
+                var button = CustomButtonSingleton<DuelButton>.Instance;
+                if (button != null)
+                {
+                    button.SetTimer(button.Cooldown);
+                }
+            }
+        }
+
+        if (Player != null && Player.TryGetModifier<IndirectAttackerModifier>(out var indirect))
+        {
+            Player.RemoveModifier(indirect);
+        }
+
         if (_arrow != null && !_arrow.IsDestroyedOrNull())
         {
             _arrow.gameObject.Destroy();
@@ -173,11 +227,25 @@ public sealed class DuelModifier(byte opponentId, bool isDuelist, Vector2 return
         }
         _hidden.Clear();
 
-        Player?.ResetAppearance();
+        if (Player != null && Player.Collider != null)
+        {
+            Player.Collider.enabled = true;
+        }
+
+        if (Player != null)
+        {
+            var remaining = GetShapeshiftAppearance();
+            if (remaining != null)
+            {
+                Player.RawSetAppearance(remaining);
+            }
+            else
+            {
+                Player.ResetAppearance();
+            }
+        }
     }
 
-    // Keep the duel modifier through death so AfterMurder can still resolve the duel
-    // (read the opponent/return position). It is removed explicitly when the duel ends.
     public override void OnDeath(DeathReason reason)
     {
     }
@@ -217,5 +285,29 @@ public sealed class DuelModifier(byte opponentId, bool isDuelist, Vector2 return
         }
 
         cos.ToggleNameVisible(!hidden);
+    }
+    [HideFromIl2Cpp]
+    private void SetAnimHoldersActive(bool active)
+    {
+        var t = Player == null ? null : Player.transform;
+        if (t == null || t.childCount < 3)
+        {
+            return;
+        }
+
+        var cosmeticsLayer = t.GetChild(2);
+        if (cosmeticsLayer == null)
+        {
+            return;
+        }
+
+        for (var i = 0; i < cosmeticsLayer.childCount; i++)
+        {
+            var child = cosmeticsLayer.GetChild(i);
+            if (child != null && child.name.StartsWith("A_") && child.gameObject.activeSelf != active)
+            {
+                child.gameObject.SetActive(active);
+            }
+        }
     }
 }

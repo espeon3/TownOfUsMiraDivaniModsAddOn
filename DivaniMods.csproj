@@ -212,6 +212,8 @@
     <EmbeddedResource Include="Resources\InnocentIntro.wav" />
     <EmbeddedResource Include="Resources\Icons\Duellist.png" />
     <EmbeddedResource Include="Resources\DuelistDuel.png" />
+    <EmbeddedResource Include="Resources\DuelStrikeButton.png" />
+    <EmbeddedResource Include="Resources\DuelistIntro.wav" />
 
   </ItemGroup>
 

@@ -17,20 +17,20 @@ using TownOfUs.Roles.Neutral;
 using TownOfUs.Utilities;
 using UnityEngine;
 using TownOfUs.Extensions;
+using TownOfUs.Roles.Crewmate;
+using TownOfUs.Interfaces;
 
 namespace DivaniMods.Roles.Neutral.NeutralOutlier;
 
 public sealed class DuelistRole(IntPtr cppPtr)
-    : NeutralRole(cppPtr), ITownOfUsRole, IWikiDiscoverable, IDoomable
+    : NeutralRole(cppPtr), ITownOfUsRole, IWikiDiscoverable, IDoomable, ICrewVariant, IContinuesGame, IUnlovable
 {
-    public static readonly Color DuelistColor = new Color32(212, 175, 55, 255);
+    public static readonly Color DuelistColor = new Color32(125, 112, 95, 255);
 
     public string RoleName => "Duelist";
-    public string RoleDescription => "Challenge them to a duel!";
+    public string RoleDescription => "ITS TIME TO D-D-D-DUEL";
     public string RoleLongDescription =>
-        "Challenge a player to a duel with the selection tablet.\n" +
-        "You both teleport to separate nearby rooms, become\n" +
-        "invisible to everyone else, and fight to the death.\n" +
+        "Challenge a player to a duel.\n" +
         "Win enough duels to claim victory.";
     public Color RoleColor => DuelistColor;
     public ModdedRoleTeams Team => ModdedRoleTeams.Custom;
@@ -45,6 +45,7 @@ public sealed class DuelistRole(IntPtr cppPtr)
     public CustomRoleConfiguration Configuration => new(this)
     {
         Icon = DivaniAssets.DuelistIcon,
+        IntroSound = DivaniAssets.DuelistIntroSound,
         MaxRoleCount = 1,
         GhostRole = (RoleTypes)RoleId.Get<NeutralGhostRole>(),
     };
@@ -57,6 +58,13 @@ public sealed class DuelistRole(IntPtr cppPtr)
     private static DuelistWinType WinType => (DuelistWinType)OptionGroupSingleton<DuelistOptions>.Instance.WinType.Value;
 
     public bool HasMetWinGoal => DuelWins >= WinsNeeded;
+
+    public RoleBehaviour CrewVariant =>
+        RoleManager.Instance.GetRole((RoleTypes)RoleId.Get<SheriffRole>());
+
+    public bool IsUnlovable => true;
+
+    public bool ContinuesGame => !Player.HasDied() && WinType == DuelistWinType.WinAlone && Helpers.GetAlivePlayers().Count <= 3 && (WinsNeeded - DuelWins) <= 2;
 
     public override void SpawnTaskHeader(PlayerControl playerControl)
     {
@@ -85,8 +93,6 @@ public sealed class DuelistRole(IntPtr cppPtr)
         TouRoleUtils.ClearTaskHeader(Player);
     }
 
-    // Win Alone forces the game to end the moment the goal is reached; Leave In Victory
-    // simply marks the duellist as a winner (DidWin) and lets the game continue.
     public bool WinConditionMet()
     {
         if (Player == null || Player.HasDied())
@@ -99,9 +105,19 @@ public sealed class DuelistRole(IntPtr cppPtr)
         }
         return HasMetWinGoal;
     }
+    public override bool CanUse(IUsable usable)
+    {
+        if (!GameManager.Instance.LogicUsables.CanUse(usable, Player))
+        {
+            return false;
+        }
 
+        var console = usable.TryCast<Console>()!;
+        return console == null || console.AllowImpostor;
+    }
     public override bool DidWin(GameOverReason gameOverReason)
     {
         return HasMetWinGoal;
     }
+
 }

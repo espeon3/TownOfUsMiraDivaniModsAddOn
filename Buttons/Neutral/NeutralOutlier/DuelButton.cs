@@ -9,6 +9,7 @@ using DivaniMods.Networking.Neutral.NeutralOutlier;
 using DivaniMods.Options;
 using DivaniMods.Roles.Neutral.NeutralOutlier;
 using TownOfUs.Buttons;
+using TownOfUs.Modifiers.Game.Alliance;
 using TownOfUs.Modifiers.Neutral;
 using TownOfUs.Utilities;
 using UnityEngine;
@@ -26,7 +27,8 @@ public sealed class DuelButton : TownOfUsRoleButton<DuelistRole>
 
     private static bool IsValidTarget(PlayerControl? plr, PlayerControl me) =>
         plr != null && plr.Data != null && !plr.Data.Disconnected && !plr.HasDied()
-        && plr.PlayerId != me.PlayerId && !plr.HasModifier<DuelModifier>();
+        && plr.PlayerId != me.PlayerId && !plr.HasModifier<DuelModifier>()
+        && plr.PlayerId != me.GetModifier<LoverModifier>()?.OtherLover?.PlayerId;
 
     public override bool CanUse()
     {
@@ -37,7 +39,7 @@ public sealed class DuelButton : TownOfUsRoleButton<DuelistRole>
         }
         if (player.HasModifier<DuelModifier>())
         {
-            return false; // already duelling
+            return false;
         }
         if (!base.CanUse())
         {
@@ -108,7 +110,6 @@ public sealed class DuelButton : TownOfUsRoleButton<DuelistRole>
 
                 DuelistRpc.RpcStartDuel(player, plr.PlayerId, duelistDest, targetDest,
                     player.GetTruePosition(), plr.GetTruePosition());
-                Timer = Cooldown;
             });
     }
 }

@@ -2,7 +2,9 @@ using MiraAPI.Modifiers;
 using MiraAPI.Networking;
 using MiraAPI.Utilities.Assets;
 using Reactor.Utilities.Extensions;
+using DivaniMods.Assets;
 using DivaniMods.Modifiers.Neutral.NeutralOutlier;
+using DivaniMods.Modules.Duelist;
 using DivaniMods.Roles.Neutral.NeutralOutlier;
 using TownOfUs.Assets;
 using TownOfUs.Buttons;
@@ -11,14 +13,12 @@ using UnityEngine;
 
 namespace DivaniMods.Buttons.Neutral.NeutralOutlier;
 
-// The only kill ability the Duelist has: usable strictly while in a duel, only against the
-// current opponent. Gated by the hidden DuelModifier so the duel target gets it too.
-public sealed class DuelFightButton : TownOfUsTargetButton<PlayerControl>, IKillButton
+public sealed class DuelStrikeButton : TownOfUsTargetButton<PlayerControl>, IKillButton
 {
     public override string Name => "Strike";
     public override BaseKeybind Keybind => Keybinds.PrimaryAction;
     public override Color TextOutlineColor => DuelistRole.DuelistColor;
-    public override LoadableAsset<Sprite> Sprite => TouAssets.KillSprite;
+    public override LoadableAsset<Sprite> Sprite => DivaniAssets.DuelStrikeButton;
     public override bool ZeroIsInfinite { get; set; } = true;
     public override float Cooldown => 0f;
     public override float InitialCooldown => 0f;
@@ -51,7 +51,8 @@ public sealed class DuelFightButton : TownOfUsTargetButton<PlayerControl>, IKill
         var lp = PlayerControl.LocalPlayer;
         if (lp != null && lp.TryGetModifier<DuelModifier>(out var mod))
         {
-            return target.PlayerId == mod.OpponentId;
+            return target.PlayerId == mod.OpponentId &&
+                   Vector2.Distance(lp.GetTruePosition(), target.GetTruePosition()) <= Distance;
         }
         return false;
     }
@@ -77,8 +78,6 @@ public sealed class DuelFightButton : TownOfUsTargetButton<PlayerControl>, IKill
         }
     }
 
-    // Bypass the DisabledModifier gates (the duel modifier is a DisabledModifier, which
-    // disables every other ability) so only this button stays usable during a duel.
     public override bool CanUse()
     {
         var lp = PlayerControl.LocalPlayer;
@@ -91,6 +90,11 @@ public sealed class DuelFightButton : TownOfUsTargetButton<PlayerControl>, IKill
             return false;
         }
         if (!lp.CanMove)
+        {
+            return false;
+        }
+
+        if (DuelManager.HasStruck(lp.PlayerId) || DuelManager.IsResolved(lp.PlayerId))
         {
             return false;
         }
@@ -109,10 +113,16 @@ public sealed class DuelFightButton : TownOfUsTargetButton<PlayerControl>, IKill
 
     protected override void OnClick()
     {
-        if (Target == null)
+        var lp = PlayerControl.LocalPlayer;
+        if (Target == null || lp == null)
         {
             return;
         }
-        PlayerControl.LocalPlayer.RpcCustomMurder(Target, MeetingCheck.OutsideMeeting);
+        if (DuelManager.HasStruck(lp.PlayerId) || DuelManager.IsResolved(lp.PlayerId))
+        {
+            return;
+        }
+        DuelManager.MarkStruck(lp.PlayerId);
+        lp.RpcCustomMurder(Target, MeetingCheck.OutsideMeeting);
     }
 }

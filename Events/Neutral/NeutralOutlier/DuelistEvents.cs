@@ -1,3 +1,4 @@
+using System.Linq;
 using MiraAPI.Events;
 using MiraAPI.Events.Vanilla.Gameplay;
 using MiraAPI.Events.Vanilla.Meeting;
@@ -6,6 +7,10 @@ using MiraAPI.Modifiers;
 using DivaniMods.Modifiers.Neutral.NeutralOutlier;
 using DivaniMods.Modules.Duelist;
 using DivaniMods.Options;
+using TownOfUs.Events;
+using TownOfUs.Events.TouEvents;
+using TownOfUs.Modifiers;
+using TownOfUs.Modules.Localization;
 
 namespace DivaniMods.Events.Neutral.NeutralOutlier;
 
@@ -28,21 +33,24 @@ public static class DuelistEvents
             return;
         }
 
-        // A duellist is isolated: outsiders can't touch the pair and the pair can't touch outsiders.
         if (srcDuel != tgtDuel)
         {
             evt.Cancel();
             return;
         }
 
-        // Both duelling, but not each other (shouldn't happen with one duel - stay safe).
         if (sm!.OpponentId != tgt.PlayerId || tm!.OpponentId != src.PlayerId)
         {
             evt.Cancel();
             return;
         }
 
-        // Victim is the duellist -> the duellist is losing this duel.
+        if (DuelManager.IsResolved(src.PlayerId) || DuelManager.IsResolved(tgt.PlayerId))
+        {
+            evt.Cancel();
+            return;
+        }
+
         if (tm.IsDuelist)
         {
             DuelManager.AddLoss(tgt.PlayerId);
@@ -50,16 +58,17 @@ public static class DuelistEvents
             var lossesToDie = (int)OptionGroupSingleton<DuelistOptions>.Instance.DuelsLostToDie.Value;
             if (DuelManager.GetLosses(tgt.PlayerId) >= lossesToDie)
             {
-                // Enough losses: let the kill through, the duellist dies for good (AfterMurder finishes up).
+                DuelManager.MarkResolved(src.PlayerId, tgt.PlayerId);
                 return;
             }
 
-            // Survives the loss: cancel the kill but the duel still ends.
+            DuelManager.MarkResolved(src.PlayerId, tgt.PlayerId);
             evt.Cancel();
             DuelManager.EndDuel(src, tgt, false);
+            return;
         }
 
-        // Otherwise the duellist is the killer (winning) -> allow it; AfterMurder handles the win.
+        DuelManager.MarkResolved(src.PlayerId, tgt.PlayerId);
     }
 
     [RegisterEvent]
@@ -78,19 +87,41 @@ public static class DuelistEvents
             return;
         }
 
-        // src is the killer (alive winner), tgt is the dead loser. The loser's body stays put.
         if (sm.IsDuelist)
         {
             DuelManager.AddWin(src.PlayerId);
         }
+        DuelManager.MarkDuelDeath(tgt.PlayerId);
+
+        var cause = TouLocale.Get("DiedToDuelist");
+        DeathHandlerModifier.UpdateDeathHandlerImmediate(
+            tgt, cause, DeathEventHandlers.CurrentRound, DeathHandlerOverride.SetTrue,
+            TouLocale.GetParsed("DiedByStringBasic").Replace("<player>", src.Data.PlayerName),
+            lockInfo: DeathHandlerOverride.SetTrue);
 
         DuelManager.EndDuel(src, tgt, true);
     }
 
     [RegisterEvent]
+    public static void OnPlayerRevive(PlayerReviveEvent evt)
+    {
+        var p = evt.Player;
+        if (p == null || !DuelManager.DiedInDuel(p.PlayerId))
+        {
+            return;
+        }
+
+        if (DuelManager.GetLosses(p.PlayerId) <= 0)
+        {
+            return;
+        }
+
+        DuelManager.RefundLoss(p.PlayerId);
+    }
+
+    [RegisterEvent]
     public static void OnStartMeeting(StartMeetingEvent _)
     {
-        // Refresh the hidden duel modifiers so vision/appearance is clean for the meeting.
         foreach (var p in PlayerControl.AllPlayerControls)
         {
             if (p != null && p.TryGetModifier<DuelModifier>(out var mod))
@@ -98,6 +129,7 @@ public static class DuelistEvents
                 p.RemoveModifier(mod);
             }
         }
+        DuelManager.ClearActiveDuelers();
     }
 
     [RegisterEvent]

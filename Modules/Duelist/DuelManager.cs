@@ -15,20 +15,64 @@ public static class DuelManager
 {
     private static readonly Dictionary<byte, int> Wins = new();
     private static readonly Dictionary<byte, int> Losses = new();
+    private static readonly HashSet<byte> ActiveDuelers = new();
+    private static readonly HashSet<byte> DuelDeaths = new();
+    private static readonly HashSet<byte> Resolved = new();
+    private static readonly HashSet<byte> Struck = new();
+
+    public static bool IsInDuel(byte playerId) => ActiveDuelers.Contains(playerId);
+
+    public static void MarkInDuel(byte playerId)
+    {
+        ActiveDuelers.Add(playerId);
+        Resolved.Remove(playerId);
+        Struck.Remove(playerId);
+    }
+
+    public static void ClearActiveDuelers()
+    {
+        ActiveDuelers.Clear();
+        Resolved.Clear();
+        Struck.Clear();
+    }
+
+    public static bool IsResolved(byte playerId) => Resolved.Contains(playerId);
+    public static void MarkResolved(byte a, byte b)
+    {
+        Resolved.Add(a);
+        Resolved.Add(b);
+    }
+
+    public static bool HasStruck(byte playerId) => Struck.Contains(playerId);
+    public static void MarkStruck(byte playerId) => Struck.Add(playerId);
+
+    public static bool DiedInDuel(byte playerId) => DuelDeaths.Contains(playerId);
+    public static void MarkDuelDeath(byte playerId) => DuelDeaths.Add(playerId);
 
     public static int GetWins(byte playerId) => Wins.TryGetValue(playerId, out var v) ? v : 0;
     public static int GetLosses(byte playerId) => Losses.TryGetValue(playerId, out var v) ? v : 0;
     public static void AddWin(byte playerId) => Wins[playerId] = GetWins(playerId) + 1;
     public static void AddLoss(byte playerId) => Losses[playerId] = GetLosses(playerId) + 1;
 
+    public static void RefundLoss(byte playerId)
+    {
+        if (Losses.TryGetValue(playerId, out var v) && v > 0)
+        {
+            Losses[playerId] = v - 1;
+        }
+        DuelDeaths.Remove(playerId);
+    }
+
     public static void ResetAll()
     {
         Wins.Clear();
         Losses.Clear();
+        ActiveDuelers.Clear();
+        DuelDeaths.Clear();
+        Resolved.Clear();
+        Struck.Clear();
     }
 
-    // Picks the two closest rooms to the duellist (excluding the room they stand in), then
-    // looks up the hardcoded duel coordinate for each. Unfilled rooms fall back to centre.
     public static bool TryGetDuelDestinations(PlayerControl duelist, PlayerControl target,
         out Vector2 duelistDest, out Vector2 targetDest)
     {
@@ -90,8 +134,6 @@ public static class DuelManager
             : room.roomArea.bounds.center;
     }
 
-    // Normal duel end: notify both players, wait briefly, then send the survivor(s) home.
-    // The loser's body (if they died) stays where it fell.
     public static void EndDuel(PlayerControl winner, PlayerControl loser, bool loserDied)
     {
         if (winner == null || loser == null)
@@ -119,9 +161,53 @@ public static class DuelManager
 
         RemoveDuel(winner);
         RemoveDuel(loser);
+
+        ApplyReturnInvisibility(winner);
+        ApplyReturnInvisibility(loser);
+        ShowReturnNotif(winner, loser);
     }
 
-    // Opponent disconnected or left mid-duel: quietly send the survivor home and clear up.
+    private static void ApplyReturnInvisibility(PlayerControl player)
+    {
+        if (player == null || player.HasDied())
+        {
+            return;
+        }
+
+        if (player.TryGetComponent<ModifierComponent>(out var comp) && !player.HasModifier<DuelReturnInvisModifier>())
+        {
+            comp.AddModifier(new DuelReturnInvisModifier());
+        }
+    }
+
+    private static void ShowReturnNotif(PlayerControl winner, PlayerControl loser)
+    {
+        Coroutines.Start(CoReturnCountdown(winner, loser));
+    }
+
+    private static IEnumerator CoReturnCountdown(PlayerControl winner, PlayerControl loser)
+    {
+        var hex = ColorUtility.ToHtmlStringRGB(DuelistRole.DuelistColor);
+        var icon = DivaniAssets.DuelistIcon.LoadAsset();
+
+        for (var seconds = 5; seconds >= 1; seconds--)
+        {
+            var local = PlayerControl.LocalPlayer;
+            if (local == null || local.HasDied() ||
+                (local.PlayerId != winner.PlayerId && local.PlayerId != loser.PlayerId))
+            {
+                yield break;
+            }
+
+            var unit = seconds == 1 ? "second" : "seconds";
+            MiraAPI.Utilities.Helpers.CreateAndShowNotification(
+                $"<b><color=#{hex}>Returning to the map in {seconds} {unit}</color></b>", Color.white,
+                new Vector3(0f, 1f, -20f), spr: icon);
+
+            yield return new WaitForSeconds(1f);
+        }
+    }
+
     public static void AbortDuel(PlayerControl player)
     {
         if (player == null || !player.TryGetModifier<DuelModifier>(out var mod))
@@ -181,7 +267,15 @@ public static class DuelManager
 
     private static void RemoveDuel(PlayerControl player)
     {
-        if (player != null && player.TryGetModifier<DuelModifier>(out var mod))
+        if (player == null)
+        {
+            return;
+        }
+
+        ActiveDuelers.Remove(player.PlayerId);
+        Resolved.Remove(player.PlayerId);
+        Struck.Remove(player.PlayerId);
+        if (player.TryGetModifier<DuelModifier>(out var mod))
         {
             player.RemoveModifier(mod);
         }
