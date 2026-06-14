@@ -39,4 +39,5 @@ public enum DivaniRpcCalls : uint
     DuelistStartDuel = 234,
     FragStolenNotify = 235,
     ArmoredAttacked = 236,
+    ClockstopperResetCooldowns = 237,
 }

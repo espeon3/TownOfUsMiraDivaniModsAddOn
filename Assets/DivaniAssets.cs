@@ -46,6 +46,7 @@ public static class DivaniAssets
     public static LoadableAsset<Sprite> RevenantIcon { get; } = new LoadableResourceAsset($"{IconPath}.Revenant.png", 200);
     public static LoadableAsset<Sprite> MosquitoIcon { get; } = new LoadableResourceAsset($"{IconPath}.Mosquito.png", 200);
     public static LoadableAsset<Sprite> DuelistIcon { get; } = new LoadableResourceAsset($"{IconPath}.Duellist.png", 200);
+    public static LoadableAsset<Sprite> ClockstopperIcon { get; } = new LoadableResourceAsset($"{IconPath}.Clockstopper.png", 200);
 
     // Modifier icons (200 ppu)
     public static LoadableAsset<Sprite> MementoIcon { get; } = new LoadableResourceAsset($"{IconPath}.Memento.png", 200);
@@ -90,6 +91,7 @@ public static class DivaniAssets
     public static LoadableAsset<AudioClip> ObfuscatorIntro { get; } = new LoadableAudioResourceAsset($"{ShortPath}.ObfuscatorIntro.wav");
     public static LoadableAsset<AudioClip> InnocentIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.InnocentIntro.wav");
     public static LoadableAsset<AudioClip> DuelistIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.DuelistIntro.wav");
+    public static LoadableAsset<AudioClip> ClockstopperIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.ClockstopperIntro.wav");
     // Dutch Meme Soundpack door SFX - used by DutchMemeSoundpackPatch to replace
     // the vanilla door open/close audio clips when the matching lobby toggle is on.
     public static LoadableAsset<AudioClip> DutchDoorOpen { get; } = new LoadableAudioResourceAsset($"{ShortPath}.DoorOpen.wav");

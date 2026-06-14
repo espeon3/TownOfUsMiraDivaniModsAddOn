@@ -214,9 +214,11 @@
     <EmbeddedResource Include="Resources\CunctatorIntro.wav" />
     <EmbeddedResource Include="Resources\InnocentIntro.wav" />
     <EmbeddedResource Include="Resources\Icons\Duellist.png" />
+    <EmbeddedResource Include="Resources\Icons\Clockstopper.png" />
     <EmbeddedResource Include="Resources\DuelistDuel.png" />
     <EmbeddedResource Include="Resources\DuelStrikeButton.png" />
     <EmbeddedResource Include="Resources\DuelistIntro.wav" />
+    <EmbeddedResource Include="Resources\ClockstopperIntro.wav" />
 
   </ItemGroup>
 
