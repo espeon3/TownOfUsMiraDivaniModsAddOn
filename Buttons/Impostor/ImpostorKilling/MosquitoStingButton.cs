@@ -162,7 +162,12 @@ public sealed class MosquitoStingButton : TownOfUsButton
         MosquitoRpc.RpcSpawnMosquito(shooter, target.PlayerId, dest.x, dest.y, aimbot);
 
         // Sync with the kill button: launching a sting also puts the stab on cooldown.
-        shooter.SetKillTimer(shooter.GetKillCooldown());
+        var killButton = CustomButtonSingleton<MosquitoKillButton>.Instance;
+        if (killButton != null)
+        {
+            killButton.SetTimer(killButton.Cooldown);
+        }
+        shooter.SetKillTimer(killButton?.Cooldown ?? shooter.GetKillCooldown());
     }
 
     private void OpenTargetMenu(PlayerControl player)
