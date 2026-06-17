@@ -222,6 +222,11 @@
     <EmbeddedResource Include="Resources\RetributionistIntro.wav" />
     <EmbeddedResource Include="Resources\Icons\Retributionist.png" />
     <EmbeddedResource Include="Resources\VengefulSoulRevenge.png" />
+    <EmbeddedResource Include="Resources\Icons\UAV.png" />
+    <EmbeddedResource Include="Resources\UAVAirMap.png" />
+    <EmbeddedResource Include="Resources\UAVFriendly.wav" />
+    <EmbeddedResource Include="Resources\UAVEnemy.wav" />
+    <EmbeddedResource Include="Resources\UAVEnd.wav" />
 
   </ItemGroup>
 

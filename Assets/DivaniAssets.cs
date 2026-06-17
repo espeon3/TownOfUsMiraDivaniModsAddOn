@@ -30,6 +30,7 @@ public static class DivaniAssets
     public static LoadableAsset<Sprite> DuelStrikeButton { get; } = new LoadableResourceAsset($"{ShortPath}.DuelStrikeButton.png");
     public static LoadableAsset<Sprite> VengefulSoulRevengeButton { get; } = new LoadableResourceAsset($"{ShortPath}.VengefulSoulRevenge.png");
     public static LoadableAsset<Sprite> ShuffleButton { get; } = new LoadableResourceAsset($"{ShortPath}.ShuffleButton.png",100);
+    public static LoadableAsset<Sprite> UavButton { get; } = new LoadableResourceAsset($"{ShortPath}.UAVAirMap.png", 100);
     // Role icons (200 ppu)
     public static LoadableAsset<Sprite> ThiefIcon { get; } = new LoadableResourceAsset($"{IconPath}.Thief.png", 200);
     public static LoadableAsset<Sprite> DeadlockIcon { get; } = new LoadableResourceAsset($"{IconPath}.Deadlock.png", 200);
@@ -67,6 +68,7 @@ public static class DivaniAssets
     public static LoadableAsset<Sprite> CunctatorIcon { get; } = new LoadableResourceAsset($"{IconPath}.Cunctator.png", 200);
     public static LoadableAsset<Sprite> IncompetentIcon { get; } = new LoadableResourceAsset($"{IconPath}.Incompetent.png", 200);
     public static LoadableAsset<Sprite> ArmoredIcon { get; } = new LoadableResourceAsset($"{IconPath}.Armored.png", 200);
+    public static LoadableAsset<Sprite> UavIcon { get; } = new LoadableResourceAsset($"{IconPath}.UAV.png", 200);
     // Audio clips (16000hz)
     public static LoadableAsset<AudioClip> FragileBreak { get; } = new LoadableAudioResourceAsset($"{ShortPath}.FragileBreak.wav");
     public static LoadableAsset<AudioClip> PlagueDoctorIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.PlagueDoctorIntro.wav");
@@ -95,6 +97,9 @@ public static class DivaniAssets
     public static LoadableAsset<AudioClip> DuelistIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.DuelistIntro.wav");
     public static LoadableAsset<AudioClip> ClockstopperIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.ClockstopperIntro.wav");
     public static LoadableAsset<AudioClip> RetributionistIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.RetributionistIntro.wav");
+    public static LoadableAsset<AudioClip> UavFriendlySound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.UAVFriendly.wav");
+    public static LoadableAsset<AudioClip> UavEnemySound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.UAVEnemy.wav");
+    public static LoadableAsset<AudioClip> UavEndSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.UAVEnd.wav");
     // Dutch Meme Soundpack door SFX - used by DutchMemeSoundpackPatch to replace
     // the vanilla door open/close audio clips when the matching lobby toggle is on.
     public static LoadableAsset<AudioClip> DutchDoorOpen { get; } = new LoadableAudioResourceAsset($"{ShortPath}.DoorOpen.wav");

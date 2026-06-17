@@ -43,4 +43,6 @@ public enum DivaniRpcCalls : uint
     RetributionistStartRevenge = 238,
     RetributionistRevenge = 239,
     RetributionistRevengeFailed = 240,
+    UavCall = 241,
+    UavEnd = 242,
 }
