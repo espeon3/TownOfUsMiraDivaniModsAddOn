@@ -544,9 +544,7 @@
         "\n\n<b>Retributionist</b>",
         "\n- Can no longer be assigned Postmortem modifiers.",
         "\n\n<b>UAV</b>",
-        "\n- Setting \"Notify Players of UAV\" to false now also silences notifications for enemy teams.",
-        "\n\n\r<size=108%><b>Compatibility</b></size>",
-        "\n\nAmong Us (Steam), BepInEx IL2CPP 6.x, Reactor, MiraAPI, and Town Of Us - Mira."
+        "\n- Setting \"Notify Players of UAV\" to false now also silences notifications for enemy teams."
       ]
     }
   ]
