@@ -12,6 +12,7 @@ using MiraAPI.Roles;
 using MiraAPI.Utilities;
 using Reactor.Networking.Attributes;
 using DivaniMods.Assets;
+using DivaniMods.Events.Neutral.NeutralBenign;
 using DivaniMods.Modifiers.Neutral.NeutralBenign;
 using DivaniMods.Options;
 using TownOfUs;
@@ -203,6 +204,20 @@ public sealed class CupidRole(IntPtr cppPtr)
         }
     }
 
+    [HideFromIl2Cpp]
+    public void RestoreFinalizedCouple(PlayerControl? loverOne, PlayerControl? loverTwo)
+    {
+        LoverOne = loverOne;
+        LoverTwo = loverTwo;
+        Finalized = true;
+        ProvisionalTargets.Clear();
+
+        var couple = new List<PlayerControl>();
+        if (loverOne != null) couple.Add(loverOne);
+        if (loverTwo != null) couple.Add(loverTwo);
+        _lastKnownCoupleKey = CoupleKey(couple);
+    }
+
     public bool IsLover(PlayerControl player)
     {
         if (player == null)
@@ -347,6 +362,7 @@ public sealed class CupidRole(IntPtr cppPtr)
         role.Finalized = true;
         role.ProvisionalTargets.Clear();
         role._lastKnownCoupleKey = CoupleKey([loverOne, loverTwo]);
+        CupidLoverReviveEvents.FinalizedCouples[cupid.PlayerId] = (loverOneId, loverTwoId);
 
         if (cupid.AmOwner)
         {
