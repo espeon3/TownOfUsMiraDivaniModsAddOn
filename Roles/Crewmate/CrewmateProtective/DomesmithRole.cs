@@ -36,6 +36,7 @@ public sealed class DomesmithRole(IntPtr cppPtr)
 
     public CustomRoleConfiguration Configuration => new(this)
     {
+        OptionsScreenshot = DivaniAssets.DomesmithBanner,
         Icon = DivaniAssets.DomesmithIcon,
         IntroSound = DivaniAssets.DomesmithIntroSound,
         MaxRoleCount = 1,

@@ -62,6 +62,7 @@ public sealed class CupidRole(IntPtr cppPtr)
 
     public CustomRoleConfiguration Configuration => new(this)
     {
+        OptionsScreenshot = DivaniAssets.CupidBanner,
         Icon = DivaniAssets.CupidIcon,
         IntroSound = DivaniAssets.CupidIntroSound,
         MaxRoleCount = 1,

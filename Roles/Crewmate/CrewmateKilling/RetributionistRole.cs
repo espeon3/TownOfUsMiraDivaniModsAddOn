@@ -33,6 +33,7 @@ public sealed class RetributionistRole(IntPtr cppPtr)
 
     public CustomRoleConfiguration Configuration => new(this)
     {
+        OptionsScreenshot = DivaniAssets.RetributionistBanner,
         Icon = DivaniAssets.RetributionistIcon,
         IntroSound = DivaniAssets.RetributionistIntroSound,
         MaxRoleCount = 1,

@@ -189,6 +189,22 @@
     <EmbeddedResource Include="Resources\DoorClose.wav" />
     <EmbeddedResource Include="Resources\Banners\DivaniModNewsLogo.png" />
     <EmbeddedResource Include="Resources\Banners\DivaniModsLogoNew.png" Condition="Exists('Resources\Banners\DivaniModsLogoNew.png')" />
+    <EmbeddedResource Include="Resources\OptionBanners\ThiefBanner.png" />
+    <EmbeddedResource Include="Resources\OptionBanners\ClockstopperBanner.png" />
+    <EmbeddedResource Include="Resources\OptionBanners\CunctatorBanner.png" />
+    <EmbeddedResource Include="Resources\OptionBanners\CupidBanner.png" />
+    <EmbeddedResource Include="Resources\OptionBanners\DeadlockBanner.png" />
+    <EmbeddedResource Include="Resources\OptionBanners\DemolitionistBanner.png" />
+    <EmbeddedResource Include="Resources\OptionBanners\DomesmithBanner.png" />
+    <EmbeddedResource Include="Resources\OptionBanners\DuelistBanner.png" />
+    <EmbeddedResource Include="Resources\OptionBanners\FragBanner.png" />
+    <EmbeddedResource Include="Resources\OptionBanners\InnocentBanner.png" />
+    <EmbeddedResource Include="Resources\OptionBanners\MosquitoBanner.png" />
+    <EmbeddedResource Include="Resources\OptionBanners\PortalmakerBanner.png" />
+    <EmbeddedResource Include="Resources\OptionBanners\RetributionistBanner.png" />
+    <EmbeddedResource Include="Resources\OptionBanners\SentinelBanner.png" />
+    <EmbeddedResource Include="Resources\OptionBanners\SilencerBanner.png" />
+    <EmbeddedResource Include="Resources\OptionBanners\SummonerBanner.png" />
     <EmbeddedResource Include="Resources\OpportunistIntro.wav" />
     <EmbeddedResource Include="Resources\DemolitionistIntro.wav" />
     <EmbeddedResource Include="Resources\DemolitionistExplosion.wav" />

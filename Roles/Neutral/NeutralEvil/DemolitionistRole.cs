@@ -54,6 +54,7 @@ public sealed class DemolitionistRole(IntPtr cppPtr)
 
     public CustomRoleConfiguration Configuration => new(this)
     {
+        OptionsScreenshot = DivaniAssets.DemolitionistBanner,
         Icon = DivaniAssets.DemolitionistIcon,
         IntroSound = DivaniAssets.DemolitionistIntroSound,
         MaxRoleCount = 1,

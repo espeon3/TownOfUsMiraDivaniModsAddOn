@@ -38,6 +38,7 @@ public sealed class DeadlockRole(IntPtr cppPtr)
 
     public CustomRoleConfiguration Configuration => new(this)
     {
+        OptionsScreenshot = DivaniAssets.DeadlockBanner,
         Icon = DivaniAssets.DeadlockIcon,
         IntroSound = DivaniAssets.DeadlockIntroSound,
         MaxRoleCount = 1,

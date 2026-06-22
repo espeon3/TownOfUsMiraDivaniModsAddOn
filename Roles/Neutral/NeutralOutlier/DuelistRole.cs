@@ -50,6 +50,7 @@ public sealed class DuelistRole(IntPtr cppPtr)
 
     public CustomRoleConfiguration Configuration => new(this)
     {
+        OptionsScreenshot = DivaniAssets.DuelistBanner,
         Icon = DivaniAssets.DuelistIcon,
         IntroSound = DivaniAssets.DuelistIntroSound,
         MaxRoleCount = 1,

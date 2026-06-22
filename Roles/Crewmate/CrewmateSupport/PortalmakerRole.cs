@@ -34,6 +34,7 @@ public sealed class PortalmakerRole(IntPtr cppPtr)
 
     public CustomRoleConfiguration Configuration => new(this)
     {
+        OptionsScreenshot = DivaniAssets.PortalmakerBanner,
         Icon = DivaniAssets.PortalmakerIcon,
         IntroSound = DivaniAssets.PortalMakerIntroSound,
         MaxRoleCount = 1,

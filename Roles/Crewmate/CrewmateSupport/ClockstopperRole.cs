@@ -30,6 +30,7 @@ public sealed class ClockstopperRole(IntPtr cppPtr)
 
     public CustomRoleConfiguration Configuration => new(this)
     {
+        OptionsScreenshot = DivaniAssets.ClockstopperBanner,
         Icon = DivaniAssets.ClockstopperIcon,
         IntroSound = DivaniAssets.ClockstopperIntroSound,
         MaxRoleCount = 1,

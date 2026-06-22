@@ -55,6 +55,7 @@ public sealed class InnocentRole(IntPtr cppPtr)
 
     public CustomRoleConfiguration Configuration => new(this)
     {
+        OptionsScreenshot = DivaniAssets.InnocentBanner,
         Icon = DivaniAssets.InnocentIcon,
         IntroSound = DivaniAssets.InnocentIntroSound,
         GhostRole = (RoleTypes)RoleId.Get<NeutralGhostRole>(),

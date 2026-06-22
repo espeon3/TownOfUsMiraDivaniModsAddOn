@@ -31,13 +31,11 @@ public sealed class FragRole(IntPtr cppPtr)
     public static readonly Color FragColor = new Color32(232, 168, 124, 255);
 
     public string RoleName => "Frag";
-    public string RoleDescription => "Hot potato time!";
+    public string RoleDescription => "Here, Hold this!";
     public string RoleLongDescription =>
-        "Give a time bomb to a player.\n" +
-        "After a short random delay the timer starts.\n" +
-        "The holder can pass it on, but not back\n" +
-        "to the previous holder until it moves again.\n" +
-        "Win by outlasting all other killers.";
+        "Give a Frag to a player.\n" +
+        "Everyone can pass this Frag to one other\n"+
+        "The one holding it at the end, dies!";
     public Color RoleColor => FragColor;
     public ModdedRoleTeams Team => ModdedRoleTeams.Custom;
     public RoleAlignment RoleAlignment => RoleAlignment.NeutralKilling;
@@ -59,6 +57,7 @@ public sealed class FragRole(IntPtr cppPtr)
 
     public CustomRoleConfiguration Configuration => new(this)
     {
+        OptionsScreenshot = DivaniAssets.FragBanner,
         Icon = DivaniAssets.FragIcon,
         IntroSound = DivaniAssets.FragIntroSound,
         MaxRoleCount = 1,

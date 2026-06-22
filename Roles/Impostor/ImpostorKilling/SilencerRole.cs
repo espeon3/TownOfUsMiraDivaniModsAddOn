@@ -34,6 +34,7 @@ public sealed class SilencerRole(IntPtr cppPtr)
 
     public CustomRoleConfiguration Configuration => new(this)
     {
+        OptionsScreenshot = DivaniAssets.SilencerBanner,
         Icon = DivaniAssets.SilencerIcon,
         IntroSound = DivaniAssets.SilencerIntroSound,
         MaxRoleCount = 1,

@@ -44,6 +44,7 @@ public sealed class ThiefRole(IntPtr cppPtr)
     public CustomRoleConfiguration Configuration => new(this)
     {
         Icon = DivaniAssets.ThiefIcon,
+        OptionsScreenshot = DivaniAssets.ThiefBanner,
         IntroSound = DivaniAssets.ThiefIntroSound,
     };
     

@@ -36,6 +36,7 @@ public sealed class MosquitoRole(IntPtr cppPtr)
 
     public CustomRoleConfiguration Configuration => new(this)
     {
+        OptionsScreenshot = DivaniAssets.MosquitoBanner,
         UseVanillaKillButton = false,
         Icon = DivaniAssets.MosquitoIcon,
         IntroSound = DivaniAssets.MosquitoIntroSound,

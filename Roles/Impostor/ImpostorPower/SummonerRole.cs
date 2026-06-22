@@ -65,6 +65,7 @@ public sealed class SummonerRole(IntPtr cppPtr)
 
     public CustomRoleConfiguration Configuration => new(this)
     {
+        OptionsScreenshot = DivaniAssets.SummonerBanner,
         Icon = DivaniAssets.SummonerIcon,
         IntroSound = DivaniAssets.SummonerIntroSound,
         MaxRoleCount = 1,
