@@ -37,7 +37,7 @@ public sealed class DemolitionistRole(IntPtr cppPtr)
     public ModdedRoleTeams Team => ModdedRoleTeams.Custom;
     public RoleAlignment RoleAlignment => RoleAlignment.NeutralEvil;
 
-    public DoomableType DoomHintType => DoomableType.Relentless;
+    public DoomableType DoomHintType => DoomableType.Fearmonger;
 
     public RoleBehaviour CrewVariant =>
         RoleManager.Instance.GetRole((RoleTypes)RoleId.Get<EngineerTouRole>());

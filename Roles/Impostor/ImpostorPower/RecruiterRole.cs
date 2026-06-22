@@ -31,7 +31,7 @@ public sealed class RecruiterRole(IntPtr cppPtr)
     public ModdedRoleTeams Team => ModdedRoleTeams.Impostor;
     public RoleAlignment RoleAlignment => RoleAlignment.ImpostorPower;
 
-    public DoomableType DoomHintType => DoomableType.Insight;
+    public DoomableType DoomHintType => DoomableType.Trickster;
 
     public RoleBehaviour CrewVariant =>
         RoleManager.Instance.GetRole((RoleTypes)RoleId.Get<EngineerTouRole>());

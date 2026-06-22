@@ -25,7 +25,7 @@ public sealed class DomesmithRole(IntPtr cppPtr)
     public ModdedRoleTeams Team => ModdedRoleTeams.Crewmate;
     public RoleAlignment RoleAlignment => RoleAlignment.CrewmateProtective;
 
-    public DoomableType DoomHintType => DoomableType.Insight;
+    public DoomableType DoomHintType => DoomableType.Protective;
 
     public string GetAdvancedDescription() => RoleLongDescription + MiscUtils.AppendOptionsText(GetType());
 

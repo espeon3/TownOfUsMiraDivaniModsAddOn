@@ -24,7 +24,7 @@ public sealed class ClockstopperRole(IntPtr cppPtr)
     public ModdedRoleTeams Team => ModdedRoleTeams.Crewmate;
     public RoleAlignment RoleAlignment => RoleAlignment.CrewmateSupport;
 
-    public DoomableType DoomHintType => DoomableType.Insight;
+    public DoomableType DoomHintType => DoomableType.Trickster;
 
     public string GetAdvancedDescription() => RoleLongDescription + MiscUtils.AppendOptionsText(GetType());
 

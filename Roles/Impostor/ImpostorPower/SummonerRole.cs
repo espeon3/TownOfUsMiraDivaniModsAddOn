@@ -32,7 +32,7 @@ public sealed class SummonerRole(IntPtr cppPtr)
     public ModdedRoleTeams Team => ModdedRoleTeams.Impostor;
     public RoleAlignment RoleAlignment => RoleAlignment.ImpostorPower;
 
-    public DoomableType DoomHintType => DoomableType.Insight;
+    public DoomableType DoomHintType => DoomableType.Death;
 
     public string GetAdvancedDescription() => RoleLongDescription + MiscUtils.AppendOptionsText(GetType());
 

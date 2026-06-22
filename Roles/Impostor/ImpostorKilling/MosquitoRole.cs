@@ -25,7 +25,7 @@ public sealed class MosquitoRole(IntPtr cppPtr)
     public ModdedRoleTeams Team => ModdedRoleTeams.Impostor;
     public RoleAlignment RoleAlignment => RoleAlignment.ImpostorKilling;
 
-    public DoomableType DoomHintType => DoomableType.Insight;
+    public DoomableType DoomHintType => DoomableType.Hunter;
 
     public string GetAdvancedDescription() => RoleLongDescription + MiscUtils.AppendOptionsText(GetType());
 
