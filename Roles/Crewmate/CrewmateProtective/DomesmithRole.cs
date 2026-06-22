@@ -1,3 +1,4 @@
+using Il2CppInterop.Runtime.Attributes;
 using System;
 using System.Collections.Generic;
 using MiraAPI.Roles;
@@ -28,7 +29,7 @@ public sealed class DomesmithRole(IntPtr cppPtr)
 
     public string GetAdvancedDescription() => RoleLongDescription + MiscUtils.AppendOptionsText(GetType());
 
-    public List<CustomButtonWikiDescription> Abilities { get; } =
+    [HideFromIl2Cpp] public List<CustomButtonWikiDescription> Abilities { get; } =
     [
         new("Place Dome", "Drop a dome to protect players inside from kills.", DivaniAssets.DomesmithPlaceDomeButton)
     ];

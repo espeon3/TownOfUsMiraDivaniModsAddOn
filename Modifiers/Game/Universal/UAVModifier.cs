@@ -1,3 +1,4 @@
+using Il2CppInterop.Runtime.Attributes;
 using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
 using MiraAPI.Utilities.Assets;
@@ -31,7 +32,7 @@ public class UAVModifier : UniversalGameModifier, IColoredModifier, IWikiDiscove
         "Call in a UAV: while active, open the map to see everyone walking around." +
         MiscUtils.AppendOptionsText(GetType());
 
-    public System.Collections.Generic.List<CustomButtonWikiDescription> Abilities { get; } =
+    [HideFromIl2Cpp] public List<CustomButtonWikiDescription> Abilities { get; } =
     [
         new("Call UAV", "Call in a UAV to see your shipmates' locations.", DivaniAssets.UavButton)
     ];

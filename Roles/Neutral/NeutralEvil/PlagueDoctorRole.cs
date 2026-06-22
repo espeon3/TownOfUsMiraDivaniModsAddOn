@@ -64,7 +64,7 @@ public sealed class PlagueDoctorRole(IntPtr cppPtr)
 
     public bool HasImpostorVision => true;
 
-    public System.Collections.Generic.List<CustomButtonWikiDescription> Abilities { get; } =
+    [HideFromIl2Cpp] public List<CustomButtonWikiDescription> Abilities { get; } =
     [
         new("Infect", "Directly infect a player.", DivaniAssets.PlagueDoctorInfectButton)
     ];

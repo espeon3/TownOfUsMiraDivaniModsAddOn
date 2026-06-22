@@ -68,9 +68,7 @@ public sealed class CupidRole(IntPtr cppPtr)
         MaxRoleCount = 1,
         GhostRole = (RoleTypes)RoleId.Get<NeutralGhostRole>()
     };
-
-    [HideFromIl2Cpp]
-    public List<CustomButtonWikiDescription> Abilities { get; } =
+    [HideFromIl2Cpp] public List<CustomButtonWikiDescription> Abilities { get; } =
     [
         new("Matchmake", "Mark a player as a provisional lover.", DivaniAssets.CupidMatchmakeButton),
         new("Bestow", "Protect your lovers from death for a short time.", DivaniAssets.CupidProtectButton)

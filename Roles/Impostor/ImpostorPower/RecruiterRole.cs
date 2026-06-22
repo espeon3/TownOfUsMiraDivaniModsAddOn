@@ -1,3 +1,4 @@
+using Il2CppInterop.Runtime.Attributes;
 using System;
 using AmongUs.GameOptions;
 using MiraAPI.Modifiers;
@@ -37,7 +38,7 @@ public sealed class RecruiterRole(IntPtr cppPtr)
 
     public string GetAdvancedDescription() => RoleLongDescription + MiscUtils.AppendOptionsText(GetType());
 
-    public System.Collections.Generic.List<CustomButtonWikiDescription> Abilities { get; } =
+    [HideFromIl2Cpp] public List<CustomButtonWikiDescription> Abilities { get; } =
     [
         new("Recruit", "During the first meeting, mark one non-Impostor to convert them into an vanilla Impostor.", DivaniAssets.RecruitMeetingImpostor)
     ];

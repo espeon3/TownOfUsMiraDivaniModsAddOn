@@ -1,3 +1,4 @@
+using Il2CppInterop.Runtime.Attributes;
 using System;
 using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
@@ -49,7 +50,7 @@ public sealed class VengefulSoulRole(IntPtr cppPtr)
     public ModdedRoleTeams Team => ModdedRoleTeams.Crewmate;
     public RoleAlignment RoleAlignment => RoleAlignment.CrewmateAfterlife;
 
-    public System.Collections.Generic.List<CustomButtonWikiDescription> Abilities { get; } =
+    [HideFromIl2Cpp] public List<CustomButtonWikiDescription> Abilities { get; } =
     [
         new("Revenge", "Hunt down and kill your killer before your time runs out to get revived.", DivaniAssets.VengefulSoulRevengeButton)
     ];

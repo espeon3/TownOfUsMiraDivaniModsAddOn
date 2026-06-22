@@ -1,3 +1,4 @@
+using Il2CppInterop.Runtime.Attributes;
 using System;
 using MiraAPI.Patches.Stubs;
 using MiraAPI.Roles;
@@ -28,7 +29,7 @@ public sealed class MosquitoRole(IntPtr cppPtr)
 
     public string GetAdvancedDescription() => RoleLongDescription + MiscUtils.AppendOptionsText(GetType());
 
-    public System.Collections.Generic.List<CustomButtonWikiDescription> Abilities { get; } =
+    [HideFromIl2Cpp] public List<CustomButtonWikiDescription> Abilities { get; } =
     [
         new("Sting", "Launch a mosquito that flies to a target and stings it to death. The mosquitos can be swatted by clicking/tapping them", DivaniAssets.MosquitoStingButton)
     ];

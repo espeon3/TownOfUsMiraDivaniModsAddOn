@@ -1,3 +1,4 @@
+using Il2CppInterop.Runtime.Attributes;
 using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
 using MiraAPI.Modifiers.Types;
@@ -43,7 +44,7 @@ public class ShuffleModifier : UniversalGameModifier, IColoredModifier, IWikiDis
 
     public string GetAdvancedDescription() => "Shuffle all players' positions!" + MiscUtils.AppendOptionsText(GetType());
 
-    public System.Collections.Generic.List<CustomButtonWikiDescription> Abilities { get; } =
+    [HideFromIl2Cpp] public List<CustomButtonWikiDescription> Abilities { get; } =
     [
         new("Shuffle", "Teleport every living player to a random other player's position.", DivaniAssets.ShuffleButton)
     ];

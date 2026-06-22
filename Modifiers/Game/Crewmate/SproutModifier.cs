@@ -1,3 +1,4 @@
+using Il2CppInterop.Runtime.Attributes;
 using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
 using MiraAPI.Modifiers.Types;
@@ -29,7 +30,7 @@ public class SproutModifier : TouGameModifier, IColoredModifier, IWikiDiscoverab
 
     public string GetAdvancedDescription() => GetDescription() + MiscUtils.AppendOptionsText(GetType());
 
-    public System.Collections.Generic.List<CustomButtonWikiDescription> Abilities { get; } =
+    [HideFromIl2Cpp] public List<CustomButtonWikiDescription> Abilities { get; } =
     [
         new("Collect", "Use near a dead body to gain one random modifier that player had.", DivaniAssets.SproutCollectButton)
     ];

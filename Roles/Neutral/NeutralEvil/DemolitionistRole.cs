@@ -46,7 +46,7 @@ public sealed class DemolitionistRole(IntPtr cppPtr)
 
     public bool HasImpostorVision => true;
 
-    public System.Collections.Generic.List<CustomButtonWikiDescription> Abilities { get; } =
+    [HideFromIl2Cpp] public List<CustomButtonWikiDescription> Abilities { get; } =
     [
         new("Plant", "Plant a bomb at a console to start a sabotage. It explodes unless the crew defuses it in time.", DivaniAssets.DemolitionistPlantButton),
         new("Defuse", "Defuse the planted bomb before it triggers an explosion", DivaniAssets.DemolitionistDefuseButton)

@@ -1,3 +1,4 @@
+using Il2CppInterop.Runtime.Attributes;
 using System;
 using MiraAPI.Roles;
 using DivaniMods.Assets;
@@ -27,7 +28,7 @@ public sealed class SentinelRole(IntPtr cppPtr)
 
     public string GetAdvancedDescription() => RoleLongDescription + MiscUtils.AppendOptionsText(GetType());
 
-    public System.Collections.Generic.List<CustomButtonWikiDescription> Abilities { get; } =
+    [HideFromIl2Cpp] public List<CustomButtonWikiDescription> Abilities { get; } =
     [
         new("Place Beacon", "Place a Beacon in a room to monitor it's activity", DivaniAssets.SentinelPlaceBeaconButton)
     ];
