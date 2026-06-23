@@ -141,6 +141,7 @@
     <EmbeddedResource Include="Resources\Icons\Blindspot.png" />
     <EmbeddedResource Include="Resources\Icons\Fragile.png" />
     <EmbeddedResource Include="Resources\Icons\Deadlock.png" />
+    <EmbeddedResource Include="Resources\Icons\Councillor.png" />
     <EmbeddedResource Include="Resources\Icons\PortalMaker.png" />
     <EmbeddedResource Include="Resources\Icons\Ruthless.png" />
     <EmbeddedResource Include="Resources\Icons\Nullified.png" />
@@ -179,6 +180,7 @@
     <EmbeddedResource Include="Resources\ThiefIntro.wav" />
     <EmbeddedResource Include="Resources\PortalMakerIntro.wav" />
     <EmbeddedResource Include="Resources\DeadlockIntro.wav" />
+    <EmbeddedResource Include="Resources\CouncillorIntro.wav" />
     <EmbeddedResource Include="Resources\PlacePortalSound.wav" />
     <EmbeddedResource Include="Resources\FragHeartbeat.wav" Condition="Exists('Resources\FragHeartbeat.wav')" />
     <EmbeddedResource Include="Resources\FragIntro.wav" Condition="Exists('Resources\FragIntro.wav')" />

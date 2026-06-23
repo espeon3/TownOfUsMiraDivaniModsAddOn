@@ -38,6 +38,7 @@ public static class DivaniAssets
     // Role icons (200 ppu)
     public static LoadableAsset<Sprite> ThiefIcon { get; } = new LoadableResourceAsset($"{IconPath}.Thief.png", 200);
     public static LoadableAsset<Sprite> DeadlockIcon { get; } = new LoadableResourceAsset($"{IconPath}.Deadlock.png", 200);
+    public static LoadableAsset<Sprite> CouncillorIcon { get; } = new LoadableResourceAsset($"{IconPath}.Councillor.png", 200);
     public static LoadableAsset<Sprite> PortalmakerIcon { get; } = new LoadableResourceAsset($"{IconPath}.PortalMaker.png", 200);
     public static LoadableAsset<Sprite> FragIcon { get; } = new LoadableResourceAsset($"{IconPath}.Frag.png", 200);
     public static LoadableAsset<Sprite> SilencerIcon { get; } = new LoadableResourceAsset($"{IconPath}.Silencer.png", 200);
@@ -82,6 +83,7 @@ public static class DivaniAssets
     public static LoadableAsset<AudioClip> ThiefIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.ThiefIntro.wav");
     public static LoadableAsset<AudioClip> PortalMakerIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.PortalMakerIntro.wav");
     public static LoadableAsset<AudioClip> DeadlockIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.DeadlockIntro.wav");
+    public static LoadableAsset<AudioClip> CouncillorIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.CouncillorIntro.wav");
     public static LoadableAsset<AudioClip> PlacePortalSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.PlacePortalSound.wav");
     public static LoadableAsset<AudioClip> FragHeartbeat { get; } = new LoadableAudioResourceAsset($"{ShortPath}.FragHeartbeat.wav");
     public static LoadableAsset<AudioClip> FragIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.FragIntro.wav");
