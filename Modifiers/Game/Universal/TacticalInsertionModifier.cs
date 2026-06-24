@@ -132,6 +132,12 @@ public sealed class TacticalInsertionModifier : UniversalGameModifier, IColoredM
             var location = MarkedLocation.Value;
             Player.NetTransform.RpcSnapTo(location);
 
+            MiraAPI.Utilities.Helpers.CreateAndShowNotification(
+                "<b><color=#00FF00>You spawned at the location of your Tactical Insertion</color></b>",
+                Color.white,
+                new Vector3(0f, 1f, -20f),
+                spr: DivaniAssets.TacticalInsertionIcon.LoadAsset());
+
             if (ModCompatibility.IsSubmerged())
             {
                 ModCompatibility.ChangeFloor(Player.GetTruePosition().y > -7);
