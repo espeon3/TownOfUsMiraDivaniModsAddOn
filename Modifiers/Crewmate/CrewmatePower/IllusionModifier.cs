@@ -1,7 +1,9 @@
 using MiraAPI.GameOptions;
+using MiraAPI.Modifiers;
 using MiraAPI.Modifiers.Types;
 using MiraAPI.Roles;
 using DivaniMods.Assets;
+using DivaniMods.Modifiers.Neutral.NeutralOutlier;
 using DivaniMods.Options;
 using DivaniMods.Roles.Crewmate.CrewmatePower;
 using DivaniMods.Utilities;
@@ -134,12 +136,20 @@ public sealed class IllusionModifier(PlayerControl mage) : TimedModifier, IVisua
             DivaniTimers.Remove(IllusionTimerId);
         }
 
-        Player.ResetAppearance();
-        Player.cosmetics.ToggleNameVisible(true);
-
-        if (HudManagerPatches.CamouflageCommsEnabled)
+        if (Player.TryGetModifier<DuelReturnInvisModifier>(out var duelInvis))
         {
+            Player.RawSetAppearance(duelInvis);
             Player.cosmetics.ToggleNameVisible(false);
+        }
+        else
+        {
+            Player.ResetAppearance();
+            Player.cosmetics.ToggleNameVisible(true);
+
+            if (HudManagerPatches.CamouflageCommsEnabled)
+            {
+                Player.cosmetics.ToggleNameVisible(false);
+            }
         }
 
         _applied = false;

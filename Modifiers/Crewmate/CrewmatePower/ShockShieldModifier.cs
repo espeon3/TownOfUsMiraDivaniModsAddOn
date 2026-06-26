@@ -1,9 +1,11 @@
 using MiraAPI.GameOptions;
+using MiraAPI.Modifiers;
 using MiraAPI.Modifiers.Types;
 using MiraAPI.Utilities.Assets;
 using PowerTools;
 using Reactor.Utilities.Extensions;
 using DivaniMods.Assets;
+using DivaniMods.Modifiers.Neutral.NeutralOutlier;
 using DivaniMods.Options;
 using TownOfUs.Modules.Anims;
 using TownOfUs.Options;
@@ -25,6 +27,11 @@ public sealed class ShockShieldModifier(PlayerControl mage) : TimedModifier
 
     private bool ShouldShow()
     {
+        if (Player.HasModifier<DuelModifier>())
+        {
+            return false;
+        }
+
         var genOpt = OptionGroupSingleton<GeneralOptions>.Instance;
         var seesSelf = Player.AmOwner && OptionGroupSingleton<MageOptions>.Instance.TargetSeesShockShield.Value;
         var seesMage = Mage != null && Mage.AmOwner;
