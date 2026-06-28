@@ -7,11 +7,11 @@ using Reactor.Networking.Attributes;
 using Reactor.Utilities.Extensions;
 using DivaniMods.Assets;
 using DivaniMods.Options;
+using DivaniMods.Utilities;
 using TownOfUs.Assets;
 using TownOfUs.Interfaces;
 using TownOfUs.Modifiers;
 using TownOfUs.Modifiers.Game;
-using TownOfUs.Modifiers.Game.Universal;
 using TownOfUs.Modules;
 using TownOfUs.Modules.Anims;
 using TownOfUs.Modules.Wiki;
@@ -57,7 +57,7 @@ public sealed class TacticalInsertionModifier : UniversalGameModifier, IColoredM
     public override bool IsModifierValidOn(RoleBehaviour role)
     {
         return base.IsModifierValidOn(role) &&
-            !role.Player.HasModifier<ImmovableModifier>() &&
+            !ModifierExclusions.ConflictsWithOwned(role.Player, this) &&
             !role.Player.GetModifierComponent().HasModifier<GameModifier>(true, x => x is IButtonModifier);
     }
 

@@ -1,6 +1,5 @@
 using HarmonyLib;
-using MiraAPI.Modifiers;
-using DivaniMods.Modifiers.Game.Universal;
+using DivaniMods.Utilities;
 using TownOfUs.Modifiers.Game.Universal;
 
 namespace DivaniMods.Patches;
@@ -8,9 +7,9 @@ namespace DivaniMods.Patches;
 [HarmonyPatch(typeof(ImmovableModifier), nameof(ImmovableModifier.IsModifierValidOn))]
 internal static class TacticalInsertionImmovableExclusionPatch
 {
-    private static void Postfix(RoleBehaviour role, ref bool __result)
+    private static void Postfix(ImmovableModifier __instance, RoleBehaviour role, ref bool __result)
     {
-        if (__result && role.Player.HasModifier<TacticalInsertionModifier>())
+        if (__result && ModifierExclusions.ConflictsWithOwned(role.Player, __instance))
         {
             __result = false;
         }
