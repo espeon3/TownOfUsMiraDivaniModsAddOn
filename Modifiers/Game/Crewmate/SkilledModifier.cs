@@ -4,6 +4,7 @@ using DivaniMods.Assets;
 using DivaniMods.Options;
 using DivaniMods.Utilities;
 using TownOfUs.Interfaces;
+using TownOfUs.Modifiers;
 using TownOfUs.Modifiers.Game;
 using TownOfUs.Modules.Wiki;
 using TownOfUs.Utilities;

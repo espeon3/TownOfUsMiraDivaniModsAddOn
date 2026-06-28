@@ -9,6 +9,7 @@ using DivaniMods.Assets;
 using DivaniMods.Options;
 using TownOfUs.Assets;
 using TownOfUs.Interfaces;
+using TownOfUs.Modifiers;
 using TownOfUs.Modifiers.Game;
 using TownOfUs.Modifiers.Game.Universal;
 using TownOfUs.Modules;
