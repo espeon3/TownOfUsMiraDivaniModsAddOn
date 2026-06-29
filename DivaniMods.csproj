@@ -8,7 +8,7 @@
     
     <AssemblyName>DivaniMods</AssemblyName>
     <RootNamespace>DivaniMods</RootNamespace>
-    <Version>1.3.0</Version>
+    <Version>1.3.1</Version>
     <!--
       TownOfUs + TouMiraRolesExtension live in-repo for reference only. Do not compile them here:
       this project already references TownOfUsMira.dll from BepInEx. Compiling sources duplicates
@@ -207,6 +207,7 @@
     <EmbeddedResource Include="Resources\OptionBanners\SentinelBanner.png" />
     <EmbeddedResource Include="Resources\OptionBanners\SilencerBanner.png" />
     <EmbeddedResource Include="Resources\OptionBanners\SummonerBanner.png" />
+    <EmbeddedResource Include="Resources\OptionBanners\MageBanner.png" />
     <EmbeddedResource Include="Resources\OpportunistIntro.wav" />
     <EmbeddedResource Include="Resources\DemolitionistIntro.wav" />
     <EmbeddedResource Include="Resources\DemolitionistExplosion.wav" />
@@ -243,10 +244,21 @@
     <EmbeddedResource Include="Resources\VengefulSoulRevenge.png" />
     <EmbeddedResource Include="Resources\Icons\UAV.png" />
     <EmbeddedResource Include="Resources\UAVAirMap.png" />
+    <EmbeddedResource Include="Resources\Icons\TacticalInsertion.png" />
+    <EmbeddedResource Include="Resources\TacticalInsertionButton.png" />
+    <EmbeddedResource Include="Resources\TacInsertHover.wav" />
+    <EmbeddedResource Include="Resources\TacticalInsertionNonHover.png" />
+    <EmbeddedResource Include="Resources\TacInsertPlace.wav" />
     <EmbeddedResource Include="Resources\UAVFriendly.wav" />
     <EmbeddedResource Include="Resources\UAVEnemy.wav" />
     <EmbeddedResource Include="Resources\UAVEnd.wav" />
     <EmbeddedResource Include="Resources\Icons\Cupid.png" />
+    <EmbeddedResource Include="Resources\Icons\Mage.png" />
+    <EmbeddedResource Include="Resources\MageChangeSpell.png" />
+    <EmbeddedResource Include="Resources\MageShockShield.png" />
+    <EmbeddedResource Include="Resources\MageEnergize.png" />
+    <EmbeddedResource Include="Resources\MageIllusion.png" />
+    <EmbeddedResource Include="Resources\MageIntro.wav" />
     <EmbeddedResource Include="Resources\CupidMatchmake.png" />
     <EmbeddedResource Include="Resources\CupidProtect.png" />
     <EmbeddedResource Include="Resources\CupidProtectOne.png" />
