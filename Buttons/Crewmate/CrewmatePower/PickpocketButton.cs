@@ -319,7 +319,7 @@ public class PickpocketButton : TownOfUsButton
     {
         if (modifier is ExcludedGameModifier)
             return true;
-        
+
         if (modifier.GetType().Name == "MagicMirrorModifier")
             return true;
 

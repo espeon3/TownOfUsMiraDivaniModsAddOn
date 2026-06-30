@@ -265,6 +265,8 @@
     <EmbeddedResource Include="Resources\CupidProtectTwo.png" />
     <EmbeddedResource Include="Resources\CupidIntro.wav" Condition="Exists('Resources\CupidIntro.wav')" />
     <EmbeddedResource Include="Resources\Icons\Watcher.png" />
+    <EmbeddedResource Include="Resources\Icons\Locator.png" />
+    <EmbeddedResource Include="Resources\LocatorMark.png" />
     <EmbeddedResource Include="Resources\WatcherWatch.png" />
     <EmbeddedResource Include="Resources\WatcherKillButton.png" Condition="Exists('Resources\WatcherKillButton.png')" />
     <EmbeddedResource Include="Resources\WatcherVentButton.png" Condition="Exists('Resources\WatcherVentButton.png')" />
