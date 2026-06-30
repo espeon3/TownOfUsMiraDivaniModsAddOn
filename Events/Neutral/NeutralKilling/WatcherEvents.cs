@@ -1,9 +1,11 @@
 using MiraAPI.Events;
 using MiraAPI.Events.Mira;
 using MiraAPI.Events.Vanilla.Gameplay;
+using MiraAPI.GameOptions;
 using MiraAPI.Hud;
 using DivaniMods.Buttons.Neutral.NeutralKilling;
 using DivaniMods.Modules.Watcher;
+using DivaniMods.Options;
 using DivaniMods.Roles.Neutral.NeutralKilling;
 using TownOfUs.Utilities;
 
@@ -22,7 +24,17 @@ public static class WatcherEvents
 
         if (WatcherLightSystem.IsActive)
         {
-            WatcherLightSystem.OnConfirmedRedLightKill(@event.Target);
+            var manual = WatcherLightSystem.ConsumeManualKill(@event.Target.PlayerId);
+            if (manual && killer.AmOwner
+                && OptionGroupSingleton<WatcherOptions>.Instance.KillsDuringLightsCount.Value)
+            {
+                CustomButtonSingleton<WatcherWatchButton>.Instance?.AccrueKill();
+            }
+            else
+            {
+                WatcherLightSystem.OnConfirmedRedLightKill(@event.Target);
+            }
+
             return;
         }
 

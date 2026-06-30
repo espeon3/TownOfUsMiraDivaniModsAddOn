@@ -56,8 +56,19 @@ public static class WatcherLightSystem
     private static bool _localInvisNotified;
 
     private static readonly HashSet<byte> Movers = new();
+    private static readonly HashSet<byte> ManualKills = new();
 
     public static bool IsActive => _active;
+
+    public static void RegisterManualKill(byte victimId)
+    {
+        ManualKills.Add(victimId);
+    }
+
+    public static bool ConsumeManualKill(byte victimId)
+    {
+        return ManualKills.Remove(victimId);
+    }
 
     public static bool IsRedLightActive => _active && _phase == Phase.Red;
 
@@ -83,6 +94,7 @@ public static class WatcherLightSystem
         _batchGunshotPlayed = false;
         _localInvisNotified = false;
         Movers.Clear();
+        ManualKills.Clear();
 
         _active = true;
         EnterGreen(greenDuration);
@@ -113,6 +125,7 @@ public static class WatcherLightSystem
         _localReported = false;
         _localInvisNotified = false;
         Movers.Clear();
+        ManualKills.Clear();
     }
 
     public static void RegisterMover(byte playerId)

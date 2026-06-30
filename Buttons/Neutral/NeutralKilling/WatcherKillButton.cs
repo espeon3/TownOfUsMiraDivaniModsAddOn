@@ -80,6 +80,11 @@ public sealed class WatcherKillButton : TownOfUsKillRoleButton<WatcherRole, Play
             return;
         }
 
+        if (WatcherLightSystem.IsActive)
+        {
+            WatcherLightSystem.RegisterManualKill(Target.PlayerId);
+        }
+
         player.RpcCustomMurder(Target);
 
         if (OptionGroupSingleton<WatcherOptions>.Instance.LinkWatchKillCooldown.Value)

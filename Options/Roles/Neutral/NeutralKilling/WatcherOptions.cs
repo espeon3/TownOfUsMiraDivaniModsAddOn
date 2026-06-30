@@ -39,6 +39,12 @@ public class WatcherOptions : AbstractOptionGroup<WatcherRole>
 
     public ModdedToggleOption LinkWatchKillCooldown { get; } = new("Link Watch & Kill Cooldowns", true);
 
+    public ModdedToggleOption KillsDuringLightsCount { get; } =
+        new("Kills during Red Light, Green Light count towards next charge", false)
+        {
+            Visible = () => !OptionGroupSingleton<WatcherOptions>.Instance.LinkWatchKillCooldown.Value
+        };
+
     public ModdedToggleOption GunshotSoundOnDeath { get; } = new("Enable Gunshot Sound effect on Deaths", true);
 
     public ModdedToggleOption BlockSabotage { get; } = new("Block Sabotage during Red Light, Green Light", true);
