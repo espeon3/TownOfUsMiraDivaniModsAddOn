@@ -18,6 +18,7 @@ using DivaniMods.Roles.Crewmate.CrewmateAfterlife;
 using DivaniMods.Roles.Neutral.NeutralKilling;
 using DivaniMods.Utilities;
 using TownOfUs.Extensions;
+using TownOfUs.Modules;
 using TownOfUs.Networking;
 using TownOfUs.Roles;
 using TownOfUs.Utilities;
@@ -322,6 +323,12 @@ public static class WatcherLightSystem
         var me = PlayerControl.LocalPlayer;
         if (me == null)
         {
+            return;
+        }
+
+        if (TimeLordRewindSystem.IsRewinding)
+        {
+            _redRefPos = me.GetTruePosition();
             return;
         }
 
