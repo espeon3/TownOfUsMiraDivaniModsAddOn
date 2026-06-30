@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace DivaniMods.Buttons.Neutral.NeutralKilling;
 
-public sealed class WatcherWatchButton : TownOfUsButton
+public sealed class WatcherWatchButton : TownOfUsButton, IDiseaseableButton
 {
     public static WatcherWatchButton? Instance { get; private set; }
 
@@ -50,6 +50,11 @@ public sealed class WatcherWatchButton : TownOfUsButton
     {
         Instance = this;
         return role is WatcherRole;
+    }
+
+    public void SetDiseasedTimer(float multiplier)
+    {
+        SetTimer(Cooldown * multiplier);
     }
 
     public void AddCharges(int amount)
