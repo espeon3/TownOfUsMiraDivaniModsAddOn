@@ -55,4 +55,6 @@ public enum DivaniRpcCalls : uint
     WatcherStartLights = 250,
     WatcherReportMover = 251,
     WatcherNeutralizeGhost = 252,
+    MolePlaceVent = 253,
+    MoleShowVent = 254,
 }

@@ -42,6 +42,8 @@ public static class DivaniAssets
     public static LoadableAsset<Sprite> MageEnergizeButton { get; } = new LoadableResourceAsset($"{ShortPath}.MageEnergize.png");
     public static LoadableAsset<Sprite> MageIllusionButton { get; } = new LoadableResourceAsset($"{ShortPath}.MageIllusion.png");
     public static LoadableAsset<Sprite> LocatorMarkButton { get; } = new LoadableResourceAsset($"{ShortPath}.LocatorMark.png");
+    public static LoadableAsset<Sprite> MoleDigButton { get; } = new LoadableResourceAsset($"{ShortPath}.MoleDigButton.png");
+    public static LoadableAsset<Sprite> MoleVentButton { get; } = new LoadableResourceAsset($"{ShortPath}.MoleVentButton.png");
     // Role icons (200 ppu)
     public static LoadableAsset<Sprite> ThiefIcon { get; } = new LoadableResourceAsset($"{IconPath}.Thief.png", 200);
     public static LoadableAsset<Sprite> DeadlockIcon { get; } = new LoadableResourceAsset($"{IconPath}.Deadlock.png", 200);
@@ -66,6 +68,7 @@ public static class DivaniAssets
     public static LoadableAsset<Sprite> MageIcon { get; } = new LoadableResourceAsset($"{IconPath}.Mage.png", 200);
     public static LoadableAsset<Sprite> WatcherIcon { get; } = new LoadableResourceAsset($"{IconPath}.Watcher.png", 200);
     public static LoadableAsset<Sprite> LocatorIcon { get; } = new LoadableResourceAsset($"{IconPath}.Locator.png", 200);
+    public static LoadableAsset<Sprite> MoleIcon { get; } = new LoadableResourceAsset($"{IconPath}.Mole.png", 200);
 
     // Watcher (Squid Game red/green light) sprites
     public static LoadableAsset<Sprite> WatcherWatchButton { get; } = new LoadableResourceAsset($"{ShortPath}.WatcherWatch.png");

@@ -171,6 +171,9 @@
     <EmbeddedResource Include="Resources\DemolitionistDefuse.png" />
     <EmbeddedResource Include="Resources\DemolitionistVent.png" />
     <EmbeddedResource Include="Resources\ShuffleButton.png" />
+    <EmbeddedResource Include="Resources\MoleDigButton.png" />
+    <EmbeddedResource Include="Resources\MoleVentButton.png" />
+    <EmbeddedResource Include="Resources\Icons\Mole.png" />
     <!-- Audio clips must be WAV - loaded via MiraAPI's LoadableAudioResourceAsset,
          matching how TouMiraRolesExtension ships its sounds. -->
     <EmbeddedResource Include="Resources\FragileBreak.wav" />
