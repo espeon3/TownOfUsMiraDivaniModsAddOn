@@ -19,7 +19,7 @@ public class WatcherOptions : AbstractOptionGroup<WatcherRole>
         "Red Light Duration", 4f, 2f, 8f, 0.5f, MiraNumberSuffixes.Seconds, "0.0");
 
     public ModdedNumberOption RedLightGracePeriod { get; } = new(
-        "Red Light Grace Period", 0.7f, 0f, 1.5f, 0.1f, MiraNumberSuffixes.Seconds, "0.0");
+        "Red Light Grace Period", 0.4f, 0f, 1.5f, 0.1f, MiraNumberSuffixes.Seconds, "0.0");
 
     public ModdedNumberOption RedLightGreenLightLoops { get; } = new(
         "Red Light, Green Light Loops", 2f, 1f, 4f, 1f, MiraNumberSuffixes.None);

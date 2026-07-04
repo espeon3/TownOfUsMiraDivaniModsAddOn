@@ -57,4 +57,8 @@ public enum DivaniRpcCalls : uint
     WatcherNeutralizeGhost = 252,
     MolePlaceVent = 253,
     MoleShowVent = 254,
+    TelecomSetTransmission = 255,
+    TelecomClearTransmission = 256,
+    TelecomSendChat = 257,
+    TelecomSetPendingMeetingTarget = 258,
 }

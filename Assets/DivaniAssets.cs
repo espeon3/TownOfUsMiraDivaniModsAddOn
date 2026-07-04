@@ -44,6 +44,12 @@ public static class DivaniAssets
     public static LoadableAsset<Sprite> LocatorMarkButton { get; } = new LoadableResourceAsset($"{ShortPath}.LocatorMark.png");
     public static LoadableAsset<Sprite> MoleDigButton { get; } = new LoadableResourceAsset($"{ShortPath}.MoleDigButton.png");
     public static LoadableAsset<Sprite> MoleVentButton { get; } = new LoadableResourceAsset($"{ShortPath}.MoleVentButton.png");
+    public static LoadableAsset<Sprite> TelecomTransmissionButton { get; } = new LoadableResourceAsset($"{ShortPath}.TelecomTransmission.png");
+    public static LoadableAsset<Sprite> TelecomTransmissionMeeting { get; } = new LoadableResourceAsset($"{ShortPath}.TelecomTransmissionMeeting.png", 300f);
+    public static LoadableAsset<Sprite> TelecomChatIdle { get; } = new LoadableResourceAsset($"{ShortPath}.TelecomChatIdle.png");
+    public static LoadableAsset<Sprite> TelecomChatHover { get; } = new LoadableResourceAsset($"{ShortPath}.TelecomChatHover.png");
+    public static LoadableAsset<Sprite> TelecomChatOpen { get; } = new LoadableResourceAsset($"{ShortPath}.TelecomChatOpen.png");
+    public static LoadableAsset<Sprite> TelecomChatBubble { get; } = new LoadableResourceAsset($"{ShortPath}.ChatTelecomBubble.png");
     // Role icons (200 ppu)
     public static LoadableAsset<Sprite> ThiefIcon { get; } = new LoadableResourceAsset($"{IconPath}.Thief.png", 200);
     public static LoadableAsset<Sprite> DeadlockIcon { get; } = new LoadableResourceAsset($"{IconPath}.Deadlock.png", 200);
@@ -69,6 +75,7 @@ public static class DivaniAssets
     public static LoadableAsset<Sprite> WatcherIcon { get; } = new LoadableResourceAsset($"{IconPath}.Watcher.png", 200);
     public static LoadableAsset<Sprite> LocatorIcon { get; } = new LoadableResourceAsset($"{IconPath}.Locator.png", 200);
     public static LoadableAsset<Sprite> MoleIcon { get; } = new LoadableResourceAsset($"{IconPath}.Mole.png", 200);
+    public static LoadableAsset<Sprite> TelecomIcon { get; } = new LoadableResourceAsset($"{IconPath}.Telecom.png", 200);
 
     // Watcher (Squid Game red/green light) sprites
     public static LoadableAsset<Sprite> WatcherWatchButton { get; } = new LoadableResourceAsset($"{ShortPath}.WatcherWatch.png");
@@ -137,6 +144,9 @@ public static class DivaniAssets
     public static LoadableAsset<AudioClip> MageIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.MageIntro.wav");
     public static LoadableAsset<AudioClip> TacInsertHoverSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.TacInsertHover.wav");
     public static LoadableAsset<AudioClip> TacInsertPlaceSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.TacInsertPlace.wav");
+    public static LoadableAsset<AudioClip> TelecomIntroSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.TelecomIntro.wav");
+    public static LoadableAsset<AudioClip> TelecomTransmissionSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.TelecomTransmiss.wav");
+    public static LoadableAsset<AudioClip> TelecomMessageSound { get; } = new LoadableAudioResourceAsset($"{ShortPath}.TelecomMessageSound.wav");
     // Dutch Meme Soundpack door SFX - used by DutchMemeSoundpackPatch to replace
     // the vanilla door open/close audio clips when the matching lobby toggle is on.
     public static LoadableAsset<AudioClip> DutchDoorOpen { get; } = new LoadableAudioResourceAsset($"{ShortPath}.DoorOpen.wav");

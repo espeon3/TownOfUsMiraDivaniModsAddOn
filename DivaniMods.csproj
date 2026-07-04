@@ -174,6 +174,13 @@
     <EmbeddedResource Include="Resources\MoleDigButton.png" />
     <EmbeddedResource Include="Resources\MoleVentButton.png" />
     <EmbeddedResource Include="Resources\Icons\Mole.png" />
+    <EmbeddedResource Include="Resources\Icons\Telecom.png" />
+    <EmbeddedResource Include="Resources\TelecomTransmission.png" />
+    <EmbeddedResource Include="Resources\TelecomTransmissionMeeting.png" />
+    <EmbeddedResource Include="Resources\TelecomChatIdle.png" />
+    <EmbeddedResource Include="Resources\TelecomChatHover.png" />
+    <EmbeddedResource Include="Resources\TelecomChatOpen.png" />
+    <EmbeddedResource Include="Resources\ChatTelecomBubble.png" />
     <!-- Audio clips must be WAV - loaded via MiraAPI's LoadableAudioResourceAsset,
          matching how TouMiraRolesExtension ships its sounds. -->
     <EmbeddedResource Include="Resources\FragileBreak.wav" />
@@ -262,6 +269,9 @@
     <EmbeddedResource Include="Resources\MageEnergize.png" />
     <EmbeddedResource Include="Resources\MageIllusion.png" />
     <EmbeddedResource Include="Resources\MageIntro.wav" />
+    <EmbeddedResource Include="Resources\TelecomIntro.wav" />
+    <EmbeddedResource Include="Resources\TelecomTransmiss.wav" />
+    <EmbeddedResource Include="Resources\TelecomMessageSound.wav" />
     <EmbeddedResource Include="Resources\CupidMatchmake.png" />
     <EmbeddedResource Include="Resources\CupidProtect.png" />
     <EmbeddedResource Include="Resources\CupidProtectOne.png" />
