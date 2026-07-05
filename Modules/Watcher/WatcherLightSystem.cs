@@ -82,11 +82,6 @@ public static class WatcherLightSystem
         return Options.BlockSabotage.Value && IsActive && IsAffected(player);
     }
 
-    public static bool BlocksKill(PlayerControl player)
-    {
-        return IsRedLightActive && IsAffected(player);
-    }
-
     public static void Start(byte watcherId, float greenDuration, float redDuration, float grace, int loops)
     {
         Stop();
