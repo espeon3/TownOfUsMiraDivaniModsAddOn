@@ -18,6 +18,8 @@ using TownOfUs.Buttons;
 using TownOfUs.Options;
 using TownOfUs.Utilities;
 using MiraAPI.Modifiers;
+using TownOfUs.Modifiers.Game.Alliance;
+using TownOfUs.Roles;
 
 namespace DivaniMods.Events.Crewmate.CrewmateProtective;
 
@@ -168,6 +170,23 @@ public static class DomesmithEvents
         var dome = DomeManager.FindContaining(source.GetTruePosition())
                    ?? DomeManager.FindContaining(target.GetTruePosition());
         if (dome == null)
+        {
+            return false;
+        }
+
+        var domeOwner = GameData.Instance.GetPlayerById(dome.OwnerId)?.Object;
+
+        if (domeOwner == null)
+        {
+            return false;
+        }
+
+        if (domeOwner.HasModifier<EgotistModifier>() && target.IsCrewmate() && !source.Is(RoleAlignment.CrewmateKilling) && target.PlayerId != domeOwner.PlayerId)
+        {
+            return false;
+        }
+
+        if (domeOwner.HasModifier<CrewpostorModifier>() && !target.IsImpostorAligned() && source.IsImpostorAligned())
         {
             return false;
         }
