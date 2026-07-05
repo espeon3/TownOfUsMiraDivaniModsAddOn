@@ -98,10 +98,6 @@ public sealed class MageRole(IntPtr cppPtr)
         {
             return;
         }
-
-        DivaniPlugin.Instance.Log.LogInfo(
-            $"[Mage] RpcEnergize mage={mage.Data?.PlayerName}(owner={mage.AmOwner}) target={target.Data?.PlayerName}(owner={target.AmOwner}) targetCrew={target.IsCrewmate()}");
-
         if (mage.AmOwner)
         {
             MiraAPI.Utilities.Helpers.CreateAndShowNotification(
