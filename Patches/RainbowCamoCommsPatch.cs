@@ -1,8 +1,10 @@
 using HarmonyLib;
 using MiraAPI.GameOptions;
 using MiraAPI.LocalSettings;
+using MiraAPI.Modifiers;
 using DivaniMods.Modules;
 using DivaniMods.Options;
+using TownOfUs.Modifiers.Impostor.Venerer;
 using TownOfUs.Modules;
 using TownOfUs.Modules.RainbowMod;
 using TownOfUs.Patches;
@@ -17,11 +19,6 @@ public static class RainbowCamoCommsPatch
     [HarmonyPriority(Priority.Last)]
     public static void Postfix()
     {
-        if (!HudManagerPatches.CamouflageCommsEnabled)
-        {
-            return;
-        }
-
         if (!OptionGroupSingleton<DivaniOptions>.Instance.RainbowCamoComms)
         {
             return;
@@ -33,6 +30,8 @@ public static class RainbowCamoCommsPatch
             return;
         }
 
+        var commsCamo = HudManagerPatches.CamouflageCommsEnabled;
+
         foreach (var player in PlayerControl.AllPlayerControls)
         {
             if (player == null || player.cosmetics == null)
@@ -40,7 +39,8 @@ public static class RainbowCamoCommsPatch
                 continue;
             }
 
-            if (player.GetAppearanceType() != TownOfUsAppearances.Camouflage)
+            var isCommsCamo = commsCamo && player.GetAppearanceType() == TownOfUsAppearances.Camouflage;
+            if (!isCommsCamo && !player.HasModifier<VenererCamouflageModifier>())
             {
                 continue;
             }
@@ -50,6 +50,11 @@ public static class RainbowCamoCommsPatch
             {
                 RainbowUtils.SetRainbow(body);
             }
+        }
+
+        if (!commsCamo)
+        {
+            return;
         }
 
         foreach (var fakePlayer in FakePlayer.FakePlayers)
