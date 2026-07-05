@@ -3,6 +3,7 @@ using MiraAPI.GameOptions;
 using MiraAPI.LocalSettings;
 using DivaniMods.Modules;
 using DivaniMods.Options;
+using TownOfUs.Modules;
 using TownOfUs.Modules.RainbowMod;
 using TownOfUs.Patches;
 using TownOfUs.Utilities.Appearances;
@@ -45,6 +46,21 @@ public static class RainbowCamoCommsPatch
             }
 
             var body = player.cosmetics.currentBodySprite?.BodySprite;
+            if (body != null)
+            {
+                RainbowUtils.SetRainbow(body);
+            }
+        }
+
+        foreach (var fakePlayer in FakePlayer.FakePlayers)
+        {
+            if (fakePlayer?.body == null)
+            {
+                continue;
+            }
+
+            var cosmetics = fakePlayer.body.GetComponentInChildren<CosmeticsLayer>();
+            var body = cosmetics?.currentBodySprite?.BodySprite;
             if (body != null)
             {
                 RainbowUtils.SetRainbow(body);
