@@ -8,6 +8,7 @@ using DivaniMods.Options;
 using DivaniMods.Roles.Crewmate.CrewmateSupport;
 using TownOfUs.Buttons;
 using TownOfUs.Modifiers;
+using TownOfUs.Roles.Crewmate;
 using TownOfUs.Utilities;
 using UnityEngine;
 
@@ -30,12 +31,22 @@ public sealed class MoleVentButton : TownOfUsTargetButton<Vent>
             return true;
         }
 
-        if (role == null || role.IsImpostor || role.CanVent)
+        if (role == null)
+        {
+            return false;
+        }
+
+        if (role.IsImpostor || role is EngineerTouRole)
         {
             return false;
         }
 
         if (role is ICustomRole customRole && customRole.Configuration.CanUseVent)
+        {
+            return false;
+        }
+
+        if (role is not PlumberRole && role.CanVent)
         {
             return false;
         }

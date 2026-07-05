@@ -14,7 +14,7 @@
       this project already references TownOfUsMira.dll from BepInEx. Compiling sources duplicates
       every type (CS0436) and fails without full game/Hazel refs (CS0246).
     -->
-    <DefaultItemExcludes>$(DefaultItemExcludes);TownOfUs\**\*;TouMiraRolesExtension\**\*;TheOtherRolesGMIA-main\**\*;.specstory\**\*</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);TownOfUs\**\*;TownOfUs-1.6.3\**\*;TOU-Mira-1.6.2\**\*;TouMiraRolesExtension\**\*;TheOtherRolesGMIA-main\**\*;.specstory\**\*</DefaultItemExcludes>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -173,6 +173,7 @@
     <EmbeddedResource Include="Resources\ShuffleButton.png" />
     <EmbeddedResource Include="Resources\MoleDigButton.png" />
     <EmbeddedResource Include="Resources\MoleVentButton.png" />
+    <EmbeddedResource Include="Resources\MinerVent.png" />
     <EmbeddedResource Include="Resources\Icons\Mole.png" />
     <EmbeddedResource Include="Resources\Icons\Telecom.png" />
     <EmbeddedResource Include="Resources\TelecomTransmission.png" />

@@ -16,10 +16,13 @@ public sealed class MoleOptions : AbstractOptionGroup<MoleRole>
     [ModdedNumberOption("Max Number Of Mole Vents Per Game", 1f, 6f, 1f, MiraNumberSuffixes.None)]
     public float MaxVents { get; set; } = 4f;
 
+    [ModdedNumberOption("Rounds Mole Vents Last", 0f, 15f, 1f, MiraNumberSuffixes.None, "0", true)]
+    public float VentRoundDuration { get; set; } = 2f;
+
     [ModdedEnumOption("Who Can Use Mole Vents", typeof(MoleVentUsage), ["Crewmates", "Anyone", "Mole"])]
     public MoleVentUsage VentUsage { get; set; } = MoleVentUsage.Crewmates;
 
-    [ModdedEnumOption("Vent Visibility", typeof(MoleVentVisibility), ["Immediate", "After Use"])]
+    [ModdedEnumOption("Vent Visibility", typeof(MoleVentVisibility), ["Immediate", "After Use", "After Next Meeting"])]
     public MoleVentVisibility VentVisibility { get; set; } = MoleVentVisibility.Immediate;
 
     public ModdedNumberOption DigDelay { get; } = new("Dig Delay", 3f, 0f, 10f, 0.5f, MiraNumberSuffixes.Seconds)
@@ -38,5 +41,6 @@ public enum MoleVentUsage
 public enum MoleVentVisibility
 {
     Immediate,
-    AfterUse
+    AfterUse,
+    AfterNextMeeting
 }

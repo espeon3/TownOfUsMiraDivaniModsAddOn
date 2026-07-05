@@ -2,17 +2,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Il2CppInterop.Runtime.Attributes;
 using MiraAPI.GameOptions;
 using MiraAPI.Roles;
+using MiraAPI.Utilities.Assets;
 using Reactor.Networking.Attributes;
 using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
 using DivaniMods.Assets;
+using DivaniMods.Buttons.Crewmate.CrewmateSupport;
 using DivaniMods.Options;
 using TownOfUs.Assets;
 using TownOfUs.Extensions;
 using TownOfUs.Modules.Anims;
+using TownOfUs.Modules.Localization;
 using TownOfUs.Modules.Wiki;
 using TownOfUs.Options;
 using TownOfUs.Roles;
@@ -27,6 +31,12 @@ public sealed class MoleRole(IntPtr cppPtr)
     public static readonly Color MoleColor = new Color32(150, 255, 171, 255);
 
     [HideFromIl2Cpp] public List<Vent> Vents { get; set; } = [];
+
+    // Vents queued by the Mole during a round, placed after the next meeting (owner-side only).
+    [HideFromIl2Cpp] public List<Vector3> PendingVents { get; set; } = [];
+
+    // Mole vent id -> remaining rounds before it collapses (only tracked when duration > 0).
+    [HideFromIl2Cpp] public static Dictionary<int, int> VentRounds { get; set; } = [];
 
     public string RoleName => "Mole";
     public string RoleDescription => "Dig your own tunnel network!";
@@ -50,6 +60,25 @@ public sealed class MoleRole(IntPtr cppPtr)
         MaxRoleCount = 1,
         IntroSound = TouAudio.MineSound
     };
+
+    private static Sprite? _moleVentSprite;
+
+    private static Sprite MoleVentSprite
+    {
+        get
+        {
+            if (_moleVentSprite != null)
+            {
+                return _moleVentSprite;
+            }
+
+            var prop = typeof(TouAssets).GetProperty("MinerVentSprite");
+            _moleVentSprite = prop?.GetValue(null) is LoadableAsset<Sprite> loadable
+                ? loadable.LoadAsset()
+                : DivaniAssets.MinerVentSprite.LoadAsset();
+            return _moleVentSprite;
+        }
+    }
 
     public static bool MoleVentsExist =>
         ShipStatus.Instance != null && ShipStatus.Instance.AllVents.Any(v =>
@@ -109,7 +138,7 @@ public sealed class MoleRole(IntPtr cppPtr)
 
         vent.numFramesUntilPlayerDisappearsOnEnter = 0;
         vent.numFramesUntilPlayerReappearsOnExit = 0;
-        vent.myRend.sprite = TouAssets.MinerVentSprite.LoadAsset();
+        vent.myRend.sprite = MoleVentSprite;
         vent.name = $"MoleVent-{player.PlayerId}-{ventId}";
 
         if (!player.AmOwner && !immediate)
@@ -140,10 +169,160 @@ public sealed class MoleRole(IntPtr cppPtr)
 
         mole.Vents.Add(vent);
 
-        if (player.AmOwner || immediate)
+        var duration = (int)OptionGroupSingleton<MoleOptions>.Instance.VentRoundDuration;
+        if (duration > 0)
         {
-            Coroutines.Start(mole.CoExplode(new Vector3(position.x, position.y + 1.33f, zAxis - 0.0001f)));
+            VentRounds[ventId] = duration;
         }
+    }
+
+    // Called on every client at the start of each non-intro round: age vents, collapse expired ones.
+    public static void ProcessRoundEnd()
+    {
+        if ((int)OptionGroupSingleton<MoleOptions>.Instance.VentRoundDuration <= 0)
+        {
+            return;
+        }
+
+        var expired = new List<int>();
+        foreach (var ventId in VentRounds.Keys.ToArray())
+        {
+            var rounds = VentRounds[ventId];
+            if (rounds <= 1)
+            {
+                expired.Add(ventId);
+            }
+            else
+            {
+                VentRounds[ventId] = rounds - 1;
+            }
+        }
+
+        foreach (var ventId in expired)
+        {
+            RemoveVent(ventId);
+        }
+    }
+
+    public static void RemoveVent(int ventId)
+    {
+        VentRounds.Remove(ventId);
+
+        if (ShipStatus.Instance == null)
+        {
+            return;
+        }
+
+        var vent = ShipStatus.Instance.AllVents.FirstOrDefault(v =>
+            v.name.StartsWith("MoleVent") && v.Id == ventId);
+        if (vent == null)
+        {
+            return;
+        }
+
+        var left = vent.Left;
+        var right = vent.Right;
+        if (left)
+        {
+            left.Right = right;
+        }
+
+        if (right)
+        {
+            right.Left = left;
+        }
+
+        ShipStatus.Instance.AllVents = ShipStatus.Instance.AllVents
+            .Where(v => v.Pointer != vent.Pointer).ToArray();
+
+        foreach (var mole in CustomRoleUtils.GetActiveRolesOfType<MoleRole>())
+        {
+            mole.Vents.RemoveAll(v => v == null || v.Pointer == vent.Pointer);
+        }
+
+        vent.gameObject.Destroy();
+    }
+
+    // Owner-only: place vents that were dug during the previous round (After Next Meeting mode).
+    [HideFromIl2Cpp]
+    public void PlacePendingVents()
+    {
+        if (!Player || !Player.AmOwner || PendingVents.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var pos in PendingVents.ToArray())
+        {
+            RpcPlaceVent(Player, MoleDigButton.GetNextVentId(), pos, pos.z, true);
+        }
+
+        PendingVents.Clear();
+    }
+
+    public static void ClearAll()
+    {
+        VentRounds.Clear();
+
+        foreach (var mole in CustomRoleUtils.GetActiveRolesOfType<MoleRole>())
+        {
+            mole.PendingVents.Clear();
+            mole.Vents.Clear();
+        }
+    }
+
+    [HideFromIl2Cpp]
+    public StringBuilder SetTabText()
+    {
+        var stringB = ITownOfUsRole.SetNewTabText(this);
+        var opt = OptionGroupSingleton<MoleOptions>.Instance;
+        var duration = (int)opt.VentRoundDuration;
+
+        var lifeText = duration == 0
+            ? "Dug vents last the whole game."
+            : $"Dug vents collapse after {duration} round{(duration == 1 ? string.Empty : "s")}.";
+        stringB.Append($"\n<b><size=60%>Note: {lifeText}</size></b>");
+
+        var visText = opt.VentVisibility switch
+        {
+            MoleVentVisibility.AfterUse => "Vents stay hidden until first used.",
+            MoleVentVisibility.AfterNextMeeting => "Dug vents only appear after the next meeting.",
+            _ => string.Empty,
+        };
+        if (visText != string.Empty)
+        {
+            stringB.Append($"\n<b><size=60%>{visText}</size></b>");
+        }
+
+        var activeVents = ShipStatus.Instance == null
+            ? []
+            : ShipStatus.Instance.AllVents.ToArray()
+                .Where(v => v != null && v.name.StartsWith("MoleVent")).ToList();
+
+        if (activeVents.Count > 0 || PendingVents.Count > 0)
+        {
+            stringB.Append($"\n<b>{TouLocale.GetParsed("TouRolePlumberVentListTabText")}:</b>");
+
+            foreach (var vent in activeVents)
+            {
+                var ventLabel = TouLocale.GetParsed("TouRolePlumberVentLabelTabText")
+                    .Replace("<roomName>", MiscUtils.GetRoomName(vent.transform.position));
+                var roundsText = duration != 0 && VentRounds.TryGetValue(vent.Id, out var rounds)
+                    ? $": {TouLocale.GetParsed("TouRolePlumberVentRoundsTabText").Replace("<roundsRemaining>", rounds.ToString())}"
+                    : string.Empty;
+                stringB.Append($"\n{ventLabel}{roundsText}");
+            }
+
+            foreach (var pos in PendingVents)
+            {
+                var ventLabel = TouLocale.GetParsed("TouRolePlumberVentLabelTabText")
+                    .Replace("<roomName>", MiscUtils.GetRoomName(pos));
+                var prepText = TouLocale.GetParsed("TouRolePlumberUnbuiltBarricadeTabText");
+                stringB.Append($"\n<color=#BFBFBF>{ventLabel}: {prepText}</color>");
+            }
+        }
+
+        return stringB;
     }
 
     [MethodRpc((uint)DivaniRpcCalls.MoleShowVent)]
@@ -166,14 +345,5 @@ public sealed class MoleRole(IntPtr cppPtr)
         {
             vent.gameObject.SetActive(true);
         }
-    }
-
-    [HideFromIl2Cpp]
-    public IEnumerator CoExplode(Vector3 position)
-    {
-        var explodeAnim = AnimStore.SpawnAnimAtPlayer(Player, TouAssets.VentExplodePrefab.LoadAsset());
-        explodeAnim.transform.position = position;
-        yield return new WaitForSeconds(1.166f);
-        explodeAnim.Destroy();
     }
 }

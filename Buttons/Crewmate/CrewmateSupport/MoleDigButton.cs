@@ -7,6 +7,7 @@ using DivaniMods.Options;
 using DivaniMods.Roles.Crewmate.CrewmateSupport;
 using TownOfUs.Assets;
 using TownOfUs.Buttons;
+using TownOfUs.Utilities;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -75,11 +76,33 @@ public sealed class MoleDigButton : TownOfUsRoleButton<MoleRole>
     {
         base.OnEffectEnd();
 
-        var id = GetNextVentId();
+        if (SavedPos == null)
+        {
+            return;
+        }
 
-        var immediate = OptionGroupSingleton<MoleOptions>.Instance.VentVisibility == MoleVentVisibility.Immediate;
+        var visibility = OptionGroupSingleton<MoleOptions>.Instance.VentVisibility;
 
-        MoleRole.RpcPlaceVent(PlayerControl.LocalPlayer, id, SavedPos!.Value, SavedPos.Value.z, immediate);
+        // After Next Meeting: queue silently, no sound/anim/vent until the meeting ends.
+        if (visibility == MoleVentVisibility.AfterNextMeeting)
+        {
+            Role.PendingVents.Add(SavedPos.Value);
+
+            var roomName = MiscUtils.GetRoomName(SavedPos.Value);
+            var hex = ColorUtility.ToHtmlStringRGB(MoleRole.MoleColor);
+            MiraAPI.Utilities.Helpers.CreateAndShowNotification(
+                $"<b><color=#{hex}>Your placed vent at {roomName} will activate after the next meeting.</color></b>",
+                Color.white,
+                new Vector3(0f, 1f, -20f),
+                spr: DivaniAssets.MoleDigButton.LoadAsset());
+
+            SavedPos = null;
+            return;
+        }
+
+        var immediate = visibility == MoleVentVisibility.Immediate;
+
+        MoleRole.RpcPlaceVent(PlayerControl.LocalPlayer, GetNextVentId(), SavedPos.Value, SavedPos.Value.z, immediate);
         TouAudio.PlaySound(TouAudio.MineSound);
         SavedPos = null;
     }

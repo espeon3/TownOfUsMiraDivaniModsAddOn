@@ -44,6 +44,7 @@ public static class DivaniAssets
     public static LoadableAsset<Sprite> LocatorMarkButton { get; } = new LoadableResourceAsset($"{ShortPath}.LocatorMark.png");
     public static LoadableAsset<Sprite> MoleDigButton { get; } = new LoadableResourceAsset($"{ShortPath}.MoleDigButton.png");
     public static LoadableAsset<Sprite> MoleVentButton { get; } = new LoadableResourceAsset($"{ShortPath}.MoleVentButton.png");
+    public static LoadableAsset<Sprite> MinerVentSprite { get; } = new LoadableResourceAsset($"{ShortPath}.MinerVent.png", 100);
     public static LoadableAsset<Sprite> TelecomTransmissionButton { get; } = new LoadableResourceAsset($"{ShortPath}.TelecomTransmission.png");
     public static LoadableAsset<Sprite> TelecomTransmissionMeeting { get; } = new LoadableResourceAsset($"{ShortPath}.TelecomTransmissionMeeting.png", 300f);
     public static LoadableAsset<Sprite> TelecomChatIdle { get; } = new LoadableResourceAsset($"{ShortPath}.TelecomChatIdle.png");

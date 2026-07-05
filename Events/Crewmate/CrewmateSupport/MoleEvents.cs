@@ -1,4 +1,5 @@
 using MiraAPI.Events;
+using MiraAPI.Events.Vanilla.Gameplay;
 using MiraAPI.Events.Vanilla.Usables;
 using MiraAPI.GameOptions;
 using DivaniMods.Options;
@@ -8,6 +9,24 @@ namespace DivaniMods.Events.Crewmate.CrewmateSupport;
 
 public static class MoleEvents
 {
+    [RegisterEvent]
+    public static void RoundStartEventHandler(RoundStartEvent @event)
+    {
+        if (@event.TriggeredByIntro)
+        {
+            MoleRole.ClearAll();
+            return;
+        }
+
+        MoleRole.ProcessRoundEnd();
+
+        var local = PlayerControl.LocalPlayer;
+        if (local != null && local.Data?.Role is MoleRole mole)
+        {
+            mole.PlacePendingVents();
+        }
+    }
+
     [RegisterEvent]
     public static void PlayerCanUseEventHandler(PlayerCanUseEvent @event)
     {
