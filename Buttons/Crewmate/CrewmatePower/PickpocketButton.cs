@@ -208,7 +208,14 @@ public class PickpocketButton : TownOfUsButton
             return;
         }
 
-        PerformSteal(thief, target);
+        try
+        {
+            PerformSteal(thief, target);
+        }
+        catch (Exception ex)
+        {
+            DivaniPlugin.Instance.Log.LogError($"[Thief] PerformSteal threw: {ex}");
+        }
         ResetTarget();
     }
 
@@ -320,7 +327,10 @@ public class PickpocketButton : TownOfUsButton
     {
         if (modifier is ExcludedGameModifier)
             return true;
-        
+
+        if (modifier.GetType().Name.StartsWith("Test", StringComparison.OrdinalIgnoreCase))
+            return true;
+
         if (modifier.GetType().Name == "MagicMirrorModifier")
             return true;
 
@@ -397,40 +407,36 @@ public class PickpocketButton : TownOfUsButton
     {
         return modifier is IButtonModifier;
     }
-    
-    private static readonly PropertyInfo? TouFactionProperty =
-        typeof(TouGameModifier).GetProperty("FactionType");
-    private static readonly PropertyInfo? UniversalFactionProperty =
-        typeof(UniversalGameModifier).GetProperty("FactionType");
+   
+    private static readonly string[] NonCrewFactionMarkers =
+    {
+        "Neutral", "Impostor", "Assailant", "NonCrew", "NonImp", "NonNeut",
+        "Hns", "Hider", "Seeker", "External",
+    };
 
     private static bool IsFactionValidForThief(BaseModifier modifier)
     {
-        string? factionName;
+        string? factionName = null;
         try
         {
-            factionName = modifier switch
-            {
-                TouGameModifier tgm => TouFactionProperty?.GetValue(tgm)?.ToString(),
-                UniversalGameModifier ugm => UniversalFactionProperty?.GetValue(ugm)?.ToString(),
-                _ => null,
-            };
+            var prop = modifier.GetType().GetProperty("FactionType");
+            factionName = prop?.GetValue(modifier)?.ToString();
         }
         catch
         {
-            return true;
+            factionName = null;
         }
 
-        if (factionName == null) return true;
-        
-        if (factionName.Contains("Impostor", StringComparison.OrdinalIgnoreCase)) return false;
-        if (factionName.Contains("Assailant", StringComparison.OrdinalIgnoreCase)) return false;
-        if (factionName.Contains("Neutral", StringComparison.OrdinalIgnoreCase)) return false;
-        if (factionName.Contains("NonCrew", StringComparison.OrdinalIgnoreCase)) return false;
-        if (factionName.Contains("Hider", StringComparison.OrdinalIgnoreCase)) return false;
-        if (factionName.Contains("Seeker", StringComparison.OrdinalIgnoreCase)) return false;
-        if (factionName.Contains("External", StringComparison.OrdinalIgnoreCase)) return false;
-        
-        return true;
+        if (factionName != null)
+        {
+            return factionName.Equals("Alliance", StringComparison.OrdinalIgnoreCase)
+                || factionName.Equals("Universal", StringComparison.OrdinalIgnoreCase)
+                || factionName.StartsWith("Crewmate", StringComparison.OrdinalIgnoreCase)
+                || factionName.StartsWith("Universal", StringComparison.OrdinalIgnoreCase);
+        }
+
+        var ns = modifier.GetType().Namespace ?? string.Empty;
+        return !NonCrewFactionMarkers.Any(m => ns.Contains(m, StringComparison.OrdinalIgnoreCase));
     }
 
     private static bool IsVisualModifier(BaseModifier modifier)
