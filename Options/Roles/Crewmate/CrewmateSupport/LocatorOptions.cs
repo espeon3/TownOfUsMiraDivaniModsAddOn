@@ -10,7 +10,7 @@ public class LocatorOptions : AbstractOptionGroup<LocatorRole>
     public override string GroupName => "Locator";
 
     public ModdedNumberOption AbilityUses { get; } = new(
-        "Ability Uses", 5f, 1f, 10f, 1f, MiraNumberSuffixes.None);
+        "Mark Uses", 5f, 1f, 10f, 1f, MiraNumberSuffixes.None);
 
     public ModdedNumberOption MarksPerRound { get; } = new(
         "Marks Per Round", 1f, 1f, 5f, 1f, MiraNumberSuffixes.None);
