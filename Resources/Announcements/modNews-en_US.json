@@ -628,6 +628,48 @@
         "\n- Veteran (and Mage Shock Shield) now make sure both the Ruthless attacker and the alerted shipmate die (Buff).",
         "\n- Mirrorcaster can now unleash after a Ruthless impostor killed the Magic Mirrored player."
       ]
+    },
+    {
+      "Date": "2026-07-06T12:00:00Z",
+      "Number": "10018",
+      "ShortTitle": "Divani Mods v1.3.2",
+      "Title": "Red Light, Green Light + three new Crewmate roles",
+      "SubTitle": "Watcher, Locator, Mole, Telecom join Divani Mods, plus new icons and bugfixes",
+      "Text": [
+        "\r<size=110%><b>Divani Mods v1.3.2</b></size>",
+        "\n\nIt is time to play: Red Light, Green Light. Plus more Crewmate roles and some small bugfixes.",
+        "\n\n★ <link=https://github.com/DivaniNL/TownOfUsMiraDivaniModsAddOn/releases/tag/v1.3.2>Download v1.3.2</link>",
+        "\n★ <link=https://github.com/DivaniNL/TownOfUsMiraDivaniModsAddOn/releases>All releases</link>",
+        "\n★ <link=https://github.com/DivaniNL/TownOfUsMiraDivaniModsAddOn/wiki>Wiki</link>",
+        "\n\n\r<size=108%><b>Added Role: Watcher</b> (Neutral Killing)</size>",
+        "\n\nClick the Watch button to make everyone play Red Light, Green Light. Anyone who moves during Red Light after the grace period dies. Earn charges after getting some regular kills.",
+        "\n\n\r<size=108%><b>Added Role: Locator</b> (Crewmate Support)</size>",
+        "\n\nMark a player to give them the Noisemaker Modifier until the next meeting.",
+        "\n\n\r<size=108%><b>Added Role: Mole</b> (Crewmate Support)</size>",
+        "\n\nDig vents around the map to connect a tunnel network.",
+        "\n\n\r<size=108%><b>Added Role: Telecom</b> (Crewmate Support)</size>",
+        "\n\nTransmit to a player to open a private chat!",
+        "\n\n\r<size=108%><b>General changes</b></size>",
+        "\n\n- New icons for Sprout, Armored, Cunctator, Retributionist and the Mosquito drone.",
+        "\n\n\r<size=108%><b>Bugfixes</b></size>",
+        "\n\n<b>Rainbow Camouflaged Comms</b>",
+        "\n- Fixed a bug where reaped players turned into the basic grey with the setting on.",
+        "\n- Fixed a bug where Venerer camouflage also defaulted to the regular grey.",
+        "\n\n<b>Duelist</b>",
+        "\n- Fixed a bug which showed the visual of the First Death Shield in duels, even though this is negated.",
+        "\n- Removed the limit of a 10 minute duel.",
+        "\n\n<b>Thief</b>",
+        "\n- Fixed a bug where Thief was able to be assigned Neutral Modifiers randomly.",
+        "\n\n<b>Sprout</b>",
+        "\n- Fixed a bug where Sprout was able to collect Neutral Modifiers randomly.",
+        "\n\n<b>Demolitionist</b>",
+        "\n- Fixed a bug where the Spellslinger was able to launch a Hex Bomb when a Demolitionist Sabotage is active.",
+        "\n\n\r<size=108%><b>Role/Modifier Changes</b></size>",
+        "\n\n<b>Clockstopper</b> (Addition)",
+        "\n- Alliance Modifiers now change who is reset. <link=https://github.com/DivaniNL/TownOfUsMiraDivaniModsAddOn/pull/17>#17</link>",
+        "\n\n<b>Domesmith</b> (Addition)",
+        "\n- Alliance Modifiers now change who is protected. <link=https://github.com/DivaniNL/TownOfUsMiraDivaniModsAddOn/pull/17>#17</link>"
+      ]
     }
-  ]
+  ] 
 }

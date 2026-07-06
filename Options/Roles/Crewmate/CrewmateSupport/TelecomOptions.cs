@@ -15,7 +15,7 @@ public class TelecomOptions : AbstractOptionGroup<TelecomRole>
 {
     public override string GroupName => "Telecom";
 
-    public ModdedToggleOption Anonymous { get; } = new("Telecom Is Anonymous", false);
+    public ModdedToggleOption Anonymous { get; } = new("Telecom Is Anonymous", true);
 
     public ModdedEnumOption TargetSelection { get; } = new(
         "Target Selection", (int)TelecomTargetSelectionOptions.MidRound, typeof(TelecomTargetSelectionOptions),

@@ -263,7 +263,7 @@ public sealed class TelecomRole(IntPtr cppPtr)
             telMod.Partner = target;
         }
 
-        var tgtMod = target!.GetModifier<TelecomChatModifier>() ?? target.AddModifier<TelecomChatModifier>();
+        var tgtMod = target!.GetModifier<TelecomChatModifier>() ?? target!.AddModifier<TelecomChatModifier>();
         if (tgtMod != null)
         {
             tgtMod.AmTelecom = false;
