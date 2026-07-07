@@ -40,7 +40,9 @@ public static class RainbowCamoCommsPatch
             }
 
             var isCommsCamo = commsCamo && player.GetAppearanceType() == TownOfUsAppearances.Camouflage;
-            if (!isCommsCamo && !player.HasModifier<VenererCamouflageModifier>())
+            if (!isCommsCamo &&
+                (!player.TryGetComponent<ModifierComponent>(out var modComp) ||
+                 !modComp.HasModifier<VenererCamouflageModifier>()))
             {
                 continue;
             }
