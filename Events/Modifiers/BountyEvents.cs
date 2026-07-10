@@ -19,6 +19,6 @@ public static class BountyEvents
     return;
   }
   
-  hitman.SetKillTimer(hitman.GetKillCooldown() - kcdr);
+  .SetKillTimer(hitman.GetKillCooldown() - kcdr);
 }
 }

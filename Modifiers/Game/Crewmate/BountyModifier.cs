@@ -1,4 +1,4 @@
-using IlCppInterop.Runtime.Attributes;
+using Il2CppInterop.Runtime.Attributes;
 using AmongUs.GameOptions;
 using MiraAPI.GameOptions;
 using MiraAPI.Roles;
@@ -14,14 +14,14 @@ using UnityEngine;
 
 namespace DivaniMods.Modifiers.Game.Crewmate;
 
-public sealed class BountyModifier : TOUGameModifier, IColoredModifier, IWikiDiscoverable
+public sealed class BountyModifier : Tou GameModifier, IColoredModifier, IWikiDiscoverable
 {
-    public static readonly Color BountyColor = new Color32(66, 33, 99, 255);
+    public static readonly Color ModifierUiColor = new Color32(66, 33, 99, 255);
 
     public override string ModifierName => "Bounty";
     public override string LocaleKey => "Bounty";
     public override string IntroInfo => "The more tasks you do, the higher your bounty.";
-    public override ModifierFaction FactionType => ModifierFaction.Crewmate.Postmortem;
+    public override ModifierFaction FactionType => ModifierFaction.CrewmatePostmortem;
     public override Color ModifierColor => BountyColor;
     public override LoadableAsset<Sprite>? ModifierIcon => DivaniAssets.BountyIcon;
 
@@ -29,15 +29,13 @@ public sealed class BountyModifier : TOUGameModifier, IColoredModifier, IWikiDis
 
     public string GetAdvancedDescription() => GetDescription() + MiscUtils.AppendOptionsText(GetType());
 
-    public override int GetAssignmentChance() => (Int)OptionGroupSingleton<CrewmateModifierOptions>.Instance.Bountychance.Value;
+    public override int GetAssignmentChance() => (Int)OptionGroupSingleton<CrewmateModifierOptions>.Instance.BountyChance.Value;
 
-    public override GetAmountPerGame() => (Int)OptionGroupSingleton<CrewmateModifierOptions>.Instance.Bountychance.Value;
+    public override GetAmountPerGame() => (Int)OptionGroupSingleton<CrewmateModifierOptions>.Instance.BountyChance.Value;
 
     public override bool IsModifierValidOn(RoleBehaviour Role)
    {
         return role.IsCrewmate() && base.IsModifierValidOn(role) && !ModifierExclusions.ConflictsWithOwned(role.player, this),      
    } 
    public override void OnActivate();
-   {
-   }
-}
+   } 
