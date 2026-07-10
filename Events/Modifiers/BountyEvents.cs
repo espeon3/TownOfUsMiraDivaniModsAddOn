@@ -9,9 +9,9 @@ namespace DivaniMods.Events.Modifiers;
 public static class BountyEvents
 {
     public static void TaskCompleteEventHandler(TaskCompleteEvent e); {
-      
+  var kcdr = OptionsGroupSingleton<BountyOptions>.Instance.DecreasePerTask.Value * CountCompleted();   
   var p = e.Player
   if (p.Data.IsDead()) return;
-  SetKillTimer e.source => GetKillCooldown() - (OptionsGroupSingleton<BountyOptions>.Instance.Instance.DecreasePerTask.Value * CountCompleted())
+  source.SetKillTimer(source.GetKillCooldown() - kcdr;
 } 
 }
