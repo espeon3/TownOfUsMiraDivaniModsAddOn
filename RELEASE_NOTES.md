@@ -8,7 +8,12 @@ There's a Hitman on the loose! Make sure the Bounty can join DivaniMods safely i
 ## Added
 
 ### Added Modifier: Bounty [Crewmate Postmortem]
-Get a higher Bounty for every task done, getting a temporary shield [WIP] as a reward. Once killed, your killer has a lower kill cooldown depending on your Bounty!
+Get a higher Bounty for every task done, getting a temporary shield as a reward. Once killed, your killer has a lower kill cooldown depending on your Bounty!
+
+➜ To note:
+● This role has not been tested before, so my apologies if a bug happens; please open an issue request or report it to me in the DivaniMods discord server.
+● The temporary shield after a task is not implemented yet
+● This currently only works with regular kill buttons!
 
 ## General changes
 
