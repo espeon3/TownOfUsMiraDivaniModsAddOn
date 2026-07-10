@@ -21,7 +21,6 @@ on:
       version:
         description: "Version tag to draft (e.g. v1.0.0)"
         required: true
-ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true
 
 permissions:
   contents: write
