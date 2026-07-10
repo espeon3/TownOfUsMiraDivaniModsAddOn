@@ -12,6 +12,6 @@ public static class BountyEvents
   var kcdr = OptionsGroupSingleton<BountyOptions>.Instance.DecreasePerTask.Value * CountCompleted();   
   var p = e.Player
   if (p.Data.IsDead()) return;
-  source.SetKillTimer(source.GetKillCooldown() - kcdr;
+  source.SetKillTimer(source.GetKillCooldown() - kcdr;)
 } 
 }
