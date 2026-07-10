@@ -11,14 +11,14 @@ public static class BountyEvents
     [RegisterEvent]
     public static void AfterMurderEvent (AfterMurderEvent @event) {
   var kcdr = OptionsGroupSingleton<BountyOptions>.Instance.DecreasePerTask.Value * CountCompleted();   
-  var bmod = @event.Target;
-  var hitman = @event.Source;
+  var target = @event.Target;
+  var source = @event.Source;
 
-  if (!bmod.HasModifier<BountyModifier>() || bmod == hitman || MeetingHud.Instance || !hitman.AmOwner)
+  if (!Target.HasModifier<BountyModifier>() || target == source || MeetingHud.Instance || !source.AmOwner)
   {
     return;
   }
   
   hitman.SetKillTimer(hitman.GetKillCooldown() - kcdr);
-} 
+}
 }
