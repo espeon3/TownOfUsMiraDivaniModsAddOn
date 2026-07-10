@@ -11,8 +11,8 @@ public static class BountyEvents
     [RegisterEvent]
 public static void TaskCompleteEventHandler(TaskCompleteEvent e)
     CountCompleted =>  GetNeeded(); {
-    Var killer = AfterMurderEvent.Source;
-    Var target = AfterMurderEvent.Target;
+    var killer = AfterMurderEvent.Source;
+    var target = AfterMurderEvent.Target;
 
     OnDeath TryGetKiller
     killer GetKillCooldown
