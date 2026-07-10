@@ -12,6 +12,6 @@ public static class BountyEvents
   var kcdr = OptionsGroupSingleton<BountyOptions>.Instance.DecreasePerTask.Value * CountCompleted();   
   var bmod = e.Target;
   var hitman = e.Source; 
-  source.SetKillTimer(source.GetKillCooldown() - kcdr;)
+  hitman.SetKillTimer(source.GetKillCooldown() - kcdr;)
 } 
 }
