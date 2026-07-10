@@ -9,10 +9,12 @@ namespace DivaniMods.Events.Modifiers;
 public static class BountyEvents
 {
     [RegisterEvent]
-public static void TaskCompleteEventHandler(TaskCompleteEvent e) {
-    var p = e.Player;
-    if (p.Data.IsDead()) return;
-
-    //todo: decrease Killer CD on Kill + Count tasks done
+public static void TaskCompleteEventHandler(TaskCompleteEvent e)
+    CountCompleted =>  GetNeeded(); {
+    
+    OnDeath TryGetKiller
+    Killer GetKillCooldown
+    KillCooldown => KillCooldown - OptionsGroupSingleton<BountyModifierOptions>.Instance.DecreasePerTask.Value * GetNeeded()
+    //todo: Does this work?
 }
 }
