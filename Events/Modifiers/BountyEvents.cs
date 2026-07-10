@@ -11,5 +11,5 @@ public static class BountyEvents
     public static void TaskCompleteEventHandler(TaskCompleteEvent e); {
   var p = e.Player
   if (p.Data.IsDead()) return;
-  SetKillTimer e.source => GetKillCooldown() - OptionsGroupSingleton<BountyModifierOptions>.Instance.Instance.DecreasePerTask.Value * ...
+  SetKillTimer e.source => GetKillCooldown() - OptionsGroupSingleton<BountyOptions>.Instance.Instance.DecreasePerTask.Value * ...
 }
