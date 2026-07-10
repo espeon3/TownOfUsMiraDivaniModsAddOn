@@ -8,10 +8,10 @@ namespace DivaniMods.Events.Modifiers;
 
 public static class BountyEvents
 {
-    public static void AfterMurderEvent (AfterMurderEvent e); {
+    public static void AfterMurderEvent (AfterMurderEvent e) {
   var kcdr = OptionsGroupSingleton<BountyOptions>.Instance.DecreasePerTask.Value * CountCompleted();   
   var bmod = e.Target;
   var hitman = e.Source; 
-  hitman.SetKillTimer(source.GetKillCooldown() - kcdr;)
+  hitman.SetKillTimer(source.GetKillCooldown() - kcdr);
 } 
 }
