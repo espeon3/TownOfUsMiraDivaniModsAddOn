@@ -8,15 +8,8 @@ namespace DivaniMods.Events.Modifiers;
 
 public static class BountyEvents
 {
-    [RegisterEvent]
-public static void TaskCompleteEventHandler(TaskCompleteEvent e)
-    CountCompleted =>  GetNeeded(); {
-    var killer = AfterMurderEvent.Source;
-    var target = AfterMurderEvent.Target;
-
-    OnDeath TryGetKiller
-    killer GetKillCooldown
-    KillCooldown => KillCooldown - OptionsGroupSingleton<BountyModifierOptions>.Instance.DecreasePerTask.Value * GetNeeded()
-    //todo: Does this work? + Notif for Killer: "You`ve killed the Bounty, your Kill Cooldown is now OptionsGroupSingleton<BountyModifierOptions>.Instance.DecreasePerTask.Value * GetNeeded() seconds shorter than usual!"
-}
+    public static void TaskCompleteEventHandler(TaskCompleteEvent e); {
+  var p = e.Player
+  if (p.Data.IsDead()) return;
+  SetKillTimer e.source => GetKillCooldown() - OptionsGroupSingleton<BountyModifierOptions>.Instance.Instance.DecreasePerTask.Value * ...
 }
