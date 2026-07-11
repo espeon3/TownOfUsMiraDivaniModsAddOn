@@ -8,9 +8,13 @@ namespace DivaniMods.Events.Modifiers;
 
 public static class BountyEvents
 {
+public static string TaskInfo(this PlayerControl player)
+    {
+        var completed = player.myTasks.ToArray().Count(x => x.IsComplete); }
+
     [RegisterEvent]
     public static void AfterMurderEvent (AfterMurderEvent @event) {
-  var kcdr = OptionsGroupSingleton<BountyOptions>.Instance.DecreasePerTask.Value * CountCompleted();   
+  var kcdr = OptionsGroupSingleton<BountyOptions>.Instance.DecreasePerTask.Value * completed;   
   var target = @event.Target;
   var source = @event.Source;
 
