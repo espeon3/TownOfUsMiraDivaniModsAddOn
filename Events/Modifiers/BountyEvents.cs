@@ -24,5 +24,11 @@ public static string TaskInfo(this PlayerControl player)
   }
   
   source.SetKillTimer(source.GetKillCooldown() - kcdr);
+  var buttons = CustomButtonManager.Buttons.WWhere(x => x.Enabled(source.Data.Role))OfType<IDiseaseableButton>();
+
+  foreach (var button in buttons)
+  {
+    button.SetDiseasedTimer(kcdr);
+  }
 }
 }
