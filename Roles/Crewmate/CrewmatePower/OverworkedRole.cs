@@ -27,3 +27,9 @@ public sealed class OverworkedRole(IntPtr cppPtr)
     public DoomableType DoomHintType => DoomableType.Trickster;
 
     public string GetAdvancedDescription() => RoleLongDescription + MiscUtils.AppendOptionsText(GetType());
+
+    public CustomRoleConfiguration Configuration => new(this)
+    {
+        Icon = DivaniAssets.OverworkedIcon
+    };
+}
