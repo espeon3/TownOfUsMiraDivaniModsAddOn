@@ -14,10 +14,10 @@ using UnityEngine;
 
 namespace DivaniMods.Roles.Crewmate.CrewmatePower;
 
-public sealed class ThiefRole(IntPtr cppPtr)
+public sealed class OverworkedRole(IntPtr cppPtr)
     : CrewmateRole(cppPtr), ITownOfUsRole, IWikiDiscoverable, IDoomable
 {
-    public string RoleName => "Thief";
+    public string RoleName => "Overworked";
     public string RoleDescription => "Task. Overwork. Win.";
     public string RoleLongDescription => "Do the work for others to bring forth victory for the Crewmates!";
     public Color RoleColor => new Color(0.5f, 0.3f, 0.1f);
