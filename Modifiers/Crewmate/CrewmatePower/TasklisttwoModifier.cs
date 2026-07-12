@@ -31,4 +31,17 @@ PlayerTask.GetOrCreateTask<LongTask>(overworkedRole, lt);
 PlayerTask.GetOrCreateTask<ShortTask>(overworkedRole, st);
 
 PlayerTask.GetOrCreateTask<CommonTask>(overworkedRole, ct);
+
+public static string TaskInfo(this PlayerControl player)
+    {
+        var completed = player.myTasks.ToArray().Count(x => x.IsComplete);
+        var totalTasks = player.myTasks.ToArray()
+            .Count(x => !PlayerTask.TaskIsEmergency(x) && !x.TryCast<ImportantTextTask>());
+
+if (completed = totaltasks)
+    {
+            winType = 1;
+            GameHistory.WinningFaction =
+                $"<color=#{Palette.CrewmateBlue.ToHtmlStringRGBA()}>{TouLocale.Get("CrewmateWin")}</color>";
+     }
 }
