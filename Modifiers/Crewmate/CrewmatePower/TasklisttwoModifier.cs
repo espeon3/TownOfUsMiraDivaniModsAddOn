@@ -14,7 +14,7 @@ using Object = UnityEngine.Object;
 
 namespace DivaniMods.Modifiers.Crewmate.CrewmatePower;
 
-public sealed class List2Modifier : BaseModifier
+public sealed class TasklisttwoModifier : BaseModifier
 {
     public override string ModifierName => "Task list two";
     public override LoadableAsset<Sprite>? ModifierIcon => DivaniAssets.OverworkedIcon;
