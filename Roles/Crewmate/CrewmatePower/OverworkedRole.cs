@@ -30,6 +30,7 @@ public sealed class OverworkedRole(IntPtr cppPtr)
 
     public CustomRoleConfiguration Configuration => new(this)
     {
-        Icon = DivaniAssets.OverworkedIcon
+        Icon = DivaniAssets.OverworkedIcon,
+        MaxRoleCount = 1,
     };
 }

@@ -21,9 +21,9 @@ public sealed class TasklisttwoModifier : BaseModifier
     public override bool HideOnUi => true;
 
 
-var lt = OptionsGroupSingleton<OverworkedRole>.Instance.ExtraLongTasks.Value
-var st = OptionsGroupSingleton<OverworkedRole>.Instance.ExtraShortTasks.Value
-var ct = OptionsGroupSingleton<OverworkedRole>.Instance.ExtraCommonTasks.Value
+var lt = OptionsGroupSingleton<OverworkedRole>.Instance.ExtraLongTasks.Value;
+var st = OptionsGroupSingleton<OverworkedRole>.Instance.ExtraShortTasks.Value;
+var ct = OptionsGroupSingleton<OverworkedRole>.Instance.ExtraCommonTasks.Value;
 var overworkedRole = CustomRoleUtils.GetActiveRolesOfType<CupidRole>().FirstOrDefault(x => x.IsLover(Player));
 
 PlayerTask.GetOrCreateTask<LongTask>(overworkedRole, lt);
@@ -31,3 +31,4 @@ PlayerTask.GetOrCreateTask<LongTask>(overworkedRole, lt);
 PlayerTask.GetOrCreateTask<ShortTask>(overworkedRole, st);
 
 PlayerTask.GetOrCreateTask<CommonTask>(overworkedRole, ct);
+}

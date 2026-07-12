@@ -16,4 +16,15 @@ namespace DivaniMods.Events.Crewmate.CrewmatePower;
 
 public static class OverworkedEvents
 {
-    [RegisterEvent]
+    public static string TaskInfo(this PlayerControl player)
+    {
+        var completed = player.myTasks.ToArray().Count(x => x.IsComplete);
+        var totaltasks = player.myTasks.ToArray().Count(x => !PlayerTask.TaskIsEmergency(x) && !x.TryCast<ImportantTaskText>());
+
+        if (completed = totaltasks)
+        {
+            RpcAddModifier<TasklisttwoModifier>();
+        }
+        else void
+    }
+}
