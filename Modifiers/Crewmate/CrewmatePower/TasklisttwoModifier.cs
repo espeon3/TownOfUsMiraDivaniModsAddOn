@@ -17,5 +17,5 @@ namespace DivaniMods.Modifiers.Crewmate.CrewmatePower;
 public sealed class OverworkedTasklisttwoModifier : BaseModifier
 {
     public override string ModifierName => "Task list two";
-    public override LoadableAsset<Sprite>? ModifierIcon => Divanimods.Assets;
+    public override LoadableAsset<Sprite>? ModifierIcon => DivaniAssets.OverworkedIcon;
     public override bool HideOnUi => true;
