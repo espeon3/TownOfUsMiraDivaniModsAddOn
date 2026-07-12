@@ -19,3 +19,9 @@ public sealed class TasklisttwoModifier : BaseModifier
     public override string ModifierName => "Task list two";
     public override LoadableAsset<Sprite>? ModifierIcon => DivaniAssets.OverworkedIcon;
     public override bool HideOnUi => true;
+
+
+var lt = OptionsGroupSingleton<OverworkedRole>.Instance.ExtraLongTasks.Value
+
+var overworked = 
+PlayerTask.GetOrCreateTask<ShortTask>(overworked, lt);
