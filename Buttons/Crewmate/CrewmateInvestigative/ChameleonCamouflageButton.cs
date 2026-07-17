@@ -8,9 +8,9 @@ using TownOfUs.Options.Roles.Crewmate;
 using TownOfUs.Roles.Crewmate;
 using UnityEngine;
 
-namespace DivaniMods.Buttons.Crewmate;
+namespace DivaniMods.Buttons.Crewmate.CrewmateInvestigative;
 
-public sealed class ChameleonCamouflageButton : TownOfUsRoleButton<ChameleonRole>, IAftermathableButton,
+public sealed class ChameleonCamouflageButton : IAftermathableButton,
 {
     public override Color TextOutlineColor => TownOfUsColors.Crewmate;
     public override string Name => "Camouflage";
