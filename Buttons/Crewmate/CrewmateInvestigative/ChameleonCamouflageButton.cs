@@ -1,11 +1,12 @@
 using MiraAPI.GameOptions;
 using MiraAPI.Modifiers;
 using MiraAPI.Utilities.Assets;
-using TownOfUs.Modifiers;
-using TownOfUs.Modifiers.Crewmate;
-using TownOfUs.Modifiers.Neutral;
-using TownOfUs.Options.Roles.Crewmate;
-using TownOfUs.Roles.Crewmate;
+using DivaniMods.Assets;
+using DivaniMods.Options;
+using DivaniMods.Roles.Crewmate.CrewmateInvestigative;
+using DivaniMods.Modifiers.Crewmate.CrewmateInvestigative
+using System.Collections;
+using TownOfUs.Buttons;
 using UnityEngine;
 
 namespace DivaniMods.Buttons.Crewmate.CrewmateInvestigative;
