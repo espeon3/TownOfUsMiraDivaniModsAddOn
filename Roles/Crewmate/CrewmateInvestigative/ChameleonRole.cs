@@ -14,9 +14,8 @@ public sealed class ChameleonRole(IntPtr cppPtr) : CrewmateRole(cppPtr), ITownOf
     public string RoleDescription => "Camouflage to sneakily get around and gather info!";
     public string RoleLongDescription => "Use your Camouflage ability to turn invisible and gather information.";
 
-    public string  +
-            MiscUtils.AppendOptionsText(GetType());
-    }
+        public string GetAdvancedDescription() => RoleLongDescription + MiscUtils.AppendOptionsText(GetType());
+    
 
     public Color RoleColor => TownOfUsColors.Crewmates;
     public ModdedRoleTeams Team => ModdedRoleTeams.Crewmate;
@@ -27,23 +26,6 @@ public sealed class ChameleonRole(IntPtr cppPtr) : CrewmateRole(cppPtr), ITownOf
         CanUseVent = (ChameleonVent)OptionGroupSingleton<ChameleonOptions>.Instance.CanVent.Value,
         Icon = TouRoleIcons.Swooper,
         IntroSound = TouAudio.PhantomIntroSound
-    };
-
-
-
-    [HideFromIl2Cpp]
-    public List<CustomButtonWikiDescription> Abilities
-    {
-        get
-        {
-            return new List<CustomButtonWikiDescription>
-            {
-                new(TouLocale.GetParsed($"TouRole{LocaleKey}Swoop", "Swoop"),
-                    TouLocale.GetParsed("TouRole{LocaleKey}Swoop"),
-                    TouImpAssets.SwoopSprite),
-                new(TouLocale.GetParsed($"TouRole{LocaleKey}Unswoop", "Unswoop"),
-                    TouLocale.GetParsed($"TouRole{LocaleKey}UnswoopWikiDescription"),
-                    TouImpAssets.UnswoopSprite)
             };
         }
     }
