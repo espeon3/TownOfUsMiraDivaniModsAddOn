@@ -7,6 +7,8 @@ using UnityEngine;
 namespace TownOfUs.Roles.Crewmate;
 
 public sealed class ChameleonRole(IntPtr cppPtr) : CrewmateRole(cppPtr), ITownOfUsRole, IWikiDiscoverable, IDoomable
+
+    public static readonly Color ChameleonColor = new Color32(244, 169, 60, 255);
 {
     public DoomableType DoomHintType => DoomableType.Hunter;
     public string LocaleKey => "Chameleon";
@@ -17,7 +19,7 @@ public sealed class ChameleonRole(IntPtr cppPtr) : CrewmateRole(cppPtr), ITownOf
         public string GetAdvancedDescription() => RoleLongDescription + MiscUtils.AppendOptionsText(GetType());
     
 
-    public Color RoleColor => TownOfUsColors.Crewmates;
+    public Color RoleColor => ChameleonColor;
     public ModdedRoleTeams Team => ModdedRoleTeams.Crewmate;
     public RoleAlignment RoleAlignment => RoleAlignment.CrewmateInvestigative;
 
