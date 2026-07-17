@@ -21,6 +21,11 @@ public sealed class ChameleonRole(IntPtr cppPtr) : CrewmateRole(cppPtr), ITownOf
     public ModdedRoleTeams Team => ModdedRoleTeams.Crewmate;
     public RoleAlignment RoleAlignment => RoleAlignment.CrewmateInvestigative;
 
+    [HideFromIl2Cpp] public List<CustomButtonWikiDescription> Abilities { get; } =
+    [
+        new("Canouflage", "Turn invisible for a short period of time.", DivaniAssets.ChameleonCamouflageButton)
+    ];
+
     public CustomRoleConfiguration Configuration => new(this)
     {
         CanUseVent = (ChameleonVent)OptionGroupSingleton<ChameleonOptions>.Instance.CanVent.Value,
