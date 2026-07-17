@@ -9,8 +9,7 @@ public static class ModifierExclusions
     private static readonly (string A, string B)[] ExclusivePairs =
     {
         ("SkilledModifier", "IncompetentModifier"),
-        ("TacticalInsertionModifier", "ImmovableModifier"),
-        ("BountyModifier", "DiseasedModifier"), 
+        ("TacticalInsertionModifier", "ImmovableModifier"), 
     };
 
     public static IEnumerable<string> GetConflictingNames(string modifierTypeName)
